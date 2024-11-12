@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AddContactFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:background="#74E7FA"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Contact Page"
+        android:textSize="33dp"
+        android:layout_gravity="top|center_horizontal"
+        android:gravity="center_horizontal"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="添加好友界面"
+        android:textSize="33dp"
+        android:layout_gravity="center"/>
+
+</FrameLayout>

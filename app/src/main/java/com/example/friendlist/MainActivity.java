@@ -35,6 +35,9 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.contactsItem: // contacts Page
                     replaceFragment(new ContactFragment());
                     break;
+                case R.id.addContactItem: // add contact Page
+                    replaceFragment(new AddContactFragment());
+                    break;
                 case R.id.settingsItem: // settings Page
                     replaceFragment(new SettingFragment());
                     break;
