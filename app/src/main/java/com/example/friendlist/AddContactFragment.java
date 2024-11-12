@@ -7,6 +7,9 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -59,6 +62,26 @@ public class AddContactFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_add_contact, container, false);
+        View view = inflater.inflate(R.layout.fragment_add_contact, container, false);
+        EditText input_email = view.findViewById(R.id.emailReq);
+        Button sendBtn = view.findViewById(R.id.sendReq);
+
+        sendBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String emailStr = input_email.getText().toString();
+                if(emailStr.isEmpty()){
+                    input_email.setError("Email is required to send request!");
+                    input_email.requestFocus();
+                }else{ // 肯定不可能这么简单
+                    // Send request to the email
+                    // Display a toast message to the user
+                    Toast.makeText(getContext(), "Request sent to: " + emailStr, Toast.LENGTH_SHORT).show();
+                    input_email.setText("");
+                }
+            }
+        });
+
+        return view;
     }
 }
