@@ -24,17 +24,17 @@ public class FrontendAPIProvider extends WebSocketClient {
         System.out.println("Connected to WebSocket server");
 
         // 示例：发送登录请求
-        JSONObject loginRequest = new JSONObject();
-        try {
-            loginRequest.put("action", "login");
-            loginRequest.put("email", "tester@gmail.com");
-            loginRequest.put("password", "123456");
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
-
-        send(loginRequest.toString());  // 发送 JSON 请求
-        System.out.println("Sent login request: " + loginRequest);
+//        JSONObject loginRequest = new JSONObject();
+//        try {
+//            loginRequest.put("action", "login");
+//            loginRequest.put("email", "tester@gmail.com");
+//            loginRequest.put("password", "123456");
+//        } catch (JSONException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        send(loginRequest.toString());  // 发送 JSON 请求
+//        System.out.println("Sent login request: " + loginRequest);
     }
     @Override
     public void onClose(int code, String reason, boolean remote) {
