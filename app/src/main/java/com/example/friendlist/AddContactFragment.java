@@ -68,41 +68,49 @@ public class AddContactFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        try {
-            websocket = new FrontendAPIProvider(new URI("ws://10.0.2.2:8080/backend-api"));
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
     }
 
+    public void initWebSocket() {
+        try {
+            URI uri = new URI("ws://10.0.2.2:8080/backend-api");
+            websocket = new FrontendAPIProvider(uri);
+            websocket.connect();  // 异步连接
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_add_contact, container, false);
         EditText input_email = view.findViewById(R.id.emailReq);
         Button sendBtn = view.findViewById(R.id.sendReq);
 
+        initWebSocket();
+
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 String emailStr = input_email.getText().toString();
                 if(emailStr.isEmpty()){
                     input_email.setError("Email is required to send request!");
                     input_email.requestFocus();
                 }else{ // 肯定不可能这么简单 (现在准备并入UG的前端Api)
                     // Send request to the email
-                    String uid = "184bc12a-2b5e-41a4-8342-d997ca0e7666";
+                    Log.d("WebSocketRegisiter", "程序已执行至96行，输入的邮箱为: " + emailStr);
                     try {
-                        websocket.addNewFriend(uid, emailStr);
-
+                        String temp_uid = "184bc12a-2b5e-41a4-8342-d997ca0e7666";
+                        websocket.addNewFriend(temp_uid,emailStr);
+                        sleep(600);
                         if(websocket.success){
-                            Toast.makeText(getContext(), "Request sent to: " + emailStr, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "好友请求已成功发至: " + emailStr, Toast.LENGTH_SHORT).show();
+                            Log.d("WebSocketRegisiter", "服务器已成功响应好友请求" + emailStr);
                             input_email.setText("");
-                            Log.d("WebSocketRegisiter", "服务器已成功响应" + emailStr);
                         }else{
-                            Toast.makeText(getContext(), "Request failed to: " + emailStr, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "服务器响应了失败QAQ..." + emailStr, Toast.LENGTH_SHORT).show();
                             Log.d("WebSocketRegisiter", "加好友失败QAQ..." );
                         }
                     } catch (JSONException e) {
@@ -119,5 +127,12 @@ public class AddContactFragment extends Fragment {
         });
 
         return view;
+    }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (websocket != null) {
+            websocket.close();
+        }
     }
 }
