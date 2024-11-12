@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         replaceFragment(new MessageFragment());
 
         // Onclick listener for bottom navigation items
-        binding.bottomNavigationView.setOnItemReselectedListener(item -> {
+        binding.bottomNavigationView.setOnItemSelectedListener(item -> {
 
             // Judge which item is clicked
             switch (item.getItemId()) {
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
                     replaceFragment(new SettingFragment());
                     break;
             }
-
+        return true;
         });
     }
 
