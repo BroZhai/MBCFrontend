@@ -73,7 +73,7 @@ public class AddContactFragment extends Fragment {
                 if(emailStr.isEmpty()){
                     input_email.setError("Email is required to send request!");
                     input_email.requestFocus();
-                }else{ // 肯定不可能这么简单
+                }else{ // 肯定不可能这么简单 (现在准备并入UG的前端Api)
                     // Send request to the email
                     // Display a toast message to the user
                     Toast.makeText(getContext(), "Request sent to: " + emailStr, Toast.LENGTH_SHORT).show();
