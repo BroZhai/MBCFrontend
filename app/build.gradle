@@ -48,4 +48,7 @@ dependencies {
 
     // WebSocket 依赖
     implementation 'org.java-websocket:Java-WebSocket:1.5.2'
+
+    // 导入 OkHttp
+    implementation 'com.squareup.okhttp3:okhttp:4.9.1'
 }

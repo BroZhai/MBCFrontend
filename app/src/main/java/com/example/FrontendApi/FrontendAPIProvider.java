@@ -13,20 +13,28 @@ public class FrontendAPIProvider extends WebSocketClient {
     // 构造函数，初始化 WebSocket 客户端
     public FrontendAPIProvider(URI serverURI) {
         super(serverURI);
+        this.setConnectionLostTimeout(120);
     }
-    public boolean isSuccessful = false;
+
+    public boolean success = false;
+
+    // 测试用
     @Override
     public void onOpen(ServerHandshake handshake) {
-        System.out.println("Connected to WebSocket server.");
+        System.out.println("Connected to WebSocket server");
 
-//        // 示例：发送登录请求
-//        JSONObject loginRequest = new JSONObject();
-//        loginRequest.put("action", "login");
-//        loginRequest.put("email", "tester@gmail.com");
-//        loginRequest.put("password", "123456");
-//
-//        send(loginRequest.toString());  // 发送 JSON 请求
-//        System.out.println("Sent login request: " + loginRequest);
+        // 示例：发送登录请求
+        JSONObject loginRequest = new JSONObject();
+        try {
+            loginRequest.put("action", "login");
+            loginRequest.put("email", "tester@gmail.com");
+            loginRequest.put("password", "123456");
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+        send(loginRequest.toString());  // 发送 JSON 请求
+        System.out.println("Sent login request: " + loginRequest);
     }
     @Override
     public void onClose(int code, String reason, boolean remote) {
@@ -46,7 +54,7 @@ public class FrontendAPIProvider extends WebSocketClient {
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("[←][Server] Received response: " + response);
+        System.out.println("Received response: " + response);
 
         // 根据 action 字段判断响应类型
         String action = response.optString("action", "unknown");
@@ -60,13 +68,12 @@ public class FrontendAPIProvider extends WebSocketClient {
                 break;
             case "register":
                 handleRegisterResponse(response);
-                break;
             case "startConversation":
                 handleStartConversationResponse(response);
                 break;
-            case "sendNewMessage":
-                handleSendNewMessage(response);
-                break;
+
+            case "addNewFriend":
+                handleAddNewFriendResponse(response);
 
 
                 //服务器推送给所有客户端
@@ -74,50 +81,55 @@ public class FrontendAPIProvider extends WebSocketClient {
                 handleServerPush(response);
                 break;
             default:
-                System.out.println("[←][Server] Unhandled action: " + action);
-                break;
+                System.out.println("Unhandled action: " + action);
+            break;
         }
     }
 
-    private void handleSendNewMessage(JSONObject response) {
-        boolean isSuccessful = response.optBoolean("isSuccessful", false);
-        System.out.println("[←][Server] Send new message result: " + isSuccessful);
+    private void handleAddNewFriendResponse(JSONObject response) {
+        success = response.optBoolean("success", false);
+        System.out.println("Add new friend result: " + success);
     }
 
     private void handleStartConversationResponse(JSONObject response) {
-        boolean isSuccessful = response.optBoolean("isSuccessful", false);
-        System.out.println("[-][Client] Start conversation result: " + isSuccessful);
+        success = response.optBoolean("success", false);
+        System.out.println("Start conversation result: " + success);
     }
 
 
 
     // 处理登录响应
     private void handleLoginResponse(JSONObject response) throws JSONException {
-        boolean isSuccessful = response.optBoolean("isLogonSucessful", false);
-        if (isSuccessful) {
-            System.out.println("[←][Server] Login successful. User ID: " + response.getString("uid"));
+        success = response.optBoolean("success", false);
+        if (success) {
+            System.out.println("Login successful. User ID: " + response.getString("uid"));
         } else {
-            System.out.println("[←][Server] Login failed.");
+            System.out.println("Login failed.");
         }
     }
 
     // 处理注册响应
-    public void handleRegisterResponse(JSONObject response) {
-        isSuccessful = response.optBoolean("success", false);
-
+    private void handleRegisterResponse(JSONObject response) {
+        boolean success = response.optBoolean("success");
+        if (success) {
+            System.out.println("Registration successful.");
+        } else {
+            System.out.println("Registration failed.");
+        }
     }
 
     //服务器推送，新的消息是否与自己有关
     public void handleServerPush(JSONObject response) {
         String client_action = response.optString("client_action", "client_action");
-        System.out.println("[←][Server] Server push: " + client_action);
+        System.out.println("Server push: " + client_action);
+
         //更新查询结果
         switch (client_action) {
-            case "sendNewMessage":
-                //To-do: 从服务器更新信息列表
+            case "getNewMessage":
+                //To-do: 从response中获取新消息的信息
                 break;
             default:
-                System.out.println("[←][Server] Unhandled action: " + client_action);
+                System.out.println("Unhandled action: " + client_action);
                 break;
         }
         //To-do: 发起这个Provider的uid/fid是否跟上面两个一样
@@ -133,7 +145,7 @@ public class FrontendAPIProvider extends WebSocketClient {
         registerRequest.put("password", password);
 
         send(registerRequest.toString());  // 发送 JSON 请求
-        System.out.println("[→][Client] Sent register request: " + registerRequest);
+        System.out.println("Sent register request: " + registerRequest);
     }
 
     public void sendStartConversationRequest(String uid, String fid, String content) throws JSONException {
@@ -144,22 +156,21 @@ public class FrontendAPIProvider extends WebSocketClient {
         ConversationRequest.put("content", content);
 
         send(ConversationRequest.toString());  // 发送 JSON 请求
-        System.out.println("[→][Client] Sent register request: " + ConversationRequest);
+        System.out.println("Sent register request: " + ConversationRequest);
     }
 
-    public void sendNewMessage(String uid,String fid,String content) throws JSONException {
-        JSONObject newMessageRequest = new JSONObject();
-        newMessageRequest.put("action", "sendNewMessage");
-        newMessageRequest.put("uid", uid);
-        newMessageRequest.put("fid", fid);
-        newMessageRequest.put("content", content);
+    public void addNewFriend(String uid, String email) throws JSONException {
+        JSONObject addNewFriendRequest = new JSONObject();
+        addNewFriendRequest.put("action", "addNewFriend");
+        addNewFriendRequest.put("uid", uid);
+        addNewFriendRequest.put("email", email);
 
-        send(newMessageRequest.toString());
-        System.out.println("[→][Client] Sent new message request: " + newMessageRequest);
+        send(addNewFriendRequest.toString());  // 发送 JSON 请求
+        System.out.println("Sent add new friend request: " + addNewFriendRequest);
     }
 
     //测试发起会话请求
-    public static void main(String[] args) {
+    public static void main(String[] args) throws JSONException {
         try {
             // 创建 WebSocket 客户端并连接到 WebSocket 服务器
             URI serverURI = new URI("ws://localhost:8080/backend-api");
@@ -167,12 +178,13 @@ public class FrontendAPIProvider extends WebSocketClient {
             client.connectBlocking();  // 阻塞，直到连接建立
 
             // 示例：发送注册请求
-            client.sendRegisterRequest("ABC", "ABC@exaample.com", "ABCABC");
+//            client.sendRegisterRequest("Tekon2", "Tekon@exdample.com", "password1235");
+            client.addNewFriend("184bc12a-2b5e-41a4-8342-d997ca0e7666","alohb");
             Thread.sleep(1000);
-////            client.sendStartConversationRequest("d96f962d-f8c0-4c8f-b986-b87e9c877462", "1ac162a4-5a24-4058-a3de-5eb0d639a3fb", "hello");
-//            client.sendNewMessage("d96f962d-f8c0-4c8f-b986-b87e9c877462", "1ac162a4-5a24-4058-a3de-5eb0d639a3fb", "add");
+//            client.sendStartConversationRequest("d96f962d-f8c0-4c8f-b986-b87e9c877462", "1ac162a4-5a24-4058-a3de-5eb0d639a3fb", "hello");
 
-        } catch (URISyntaxException | InterruptedException | JSONException e) {
+
+        } catch (URISyntaxException | InterruptedException e) {
             e.printStackTrace();
         }
     }
