@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+<!-- Setting up the icons for each items in the bottom nav (pre imported)-->
+    <item android:title="Messages"
+    android:id="@+id/messagesItem"
+    android:icon="@drawable/baseline_message_24"
+    />
+
+    <item android:title="Contacts"
+    android:id="@+id/contactsItem"
+    android:icon="@drawable/baseline_people_alt_24"
+    />
+
+    <item android:title="Settings"
+    android:id="@+id/settingsItem"
+    android:icon="@drawable/baseline_settings_24"
+    />
+
+</menu>
