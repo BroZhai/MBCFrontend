@@ -7,6 +7,15 @@
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:background="#74E7FA"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Setting Page"
+        android:textSize="33dp"
+        android:layout_gravity="top|center_horizontal"
+        android:gravity="center_horizontal"/>
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="设置界面"
