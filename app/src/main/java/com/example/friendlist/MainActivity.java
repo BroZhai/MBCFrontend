@@ -33,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
         Log.d("MainPage", "主页已取得登录email: " + loginEmail +" 登录密码: " + loginPassword);
         Toast.makeText(MainActivity.this, "Login Success! Welcome back, " + loginEmail, Toast.LENGTH_SHORT).show();
 
+        // 用户成功登录来到此页，存储用户登录信息
+        storeUserData(loginEmail, loginPassword);
+
         // 测试能否读取SharedPreferences存的登录数据
         SharedPreferences sp = getSharedPreferences("userdata", MODE_PRIVATE);
         String email = sp.getString("email", "null");
@@ -70,5 +73,16 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.frame_layout, fragment);
         transaction.commit();
+    }
+
+    // Save user login data once successfully login
+    public void storeUserData(String email, String password) {
+        // 将用户数据保存至SharedPreferences方法
+        SharedPreferences sp = getSharedPreferences("userdata", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("email", email);
+        editor.putString("password", password);
+        editor.putBoolean("loginStatus",true);
+        editor.apply();
     }
 }
