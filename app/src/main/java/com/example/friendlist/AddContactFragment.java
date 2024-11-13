@@ -94,7 +94,7 @@ public class AddContactFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-                String emailStr = input_email.getText().toString();
+                String emailStr = input_email.getText().toString().trim();
                 if(emailStr.isEmpty()){
                     input_email.setError("Email is required to send request!");
                     input_email.requestFocus();
