@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
         loginEmail = getIntent().getStringExtra("email");
         loginPassword = getIntent().getStringExtra("password");
-        Log.d("MainPage", "主页已取得登录email: " + loginEmail +" 登录密码: " + loginPassword);
+        Log.d("IntentReceiver", "主页已取得登录email: " + loginEmail +" 登录密码: " + loginPassword);
         Toast.makeText(MainActivity.this, "Login Success! Welcome back, " + loginEmail, Toast.LENGTH_SHORT).show();
 
         // 用户成功登录来到此页，存储用户登录信息
@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         String email = sp.getString("email", "null");
         String password = sp.getString("password", "null");
         boolean loginStatus = sp.getBoolean("loginStatus", false);
-        Log.d("MainPage", "尝试从SharedPreferences中获取的email:" + email +" 密码:" + password + " 登录状态为:" + loginStatus);
+        Log.d("MainPageSP", "尝试从SharedPreferences中获取的email:" + email +" 密码:" + password + " 登录状态为:" + loginStatus);
 
         // Set the default fragment_page for the first time entry
         replaceFragment(new MessageFragment());

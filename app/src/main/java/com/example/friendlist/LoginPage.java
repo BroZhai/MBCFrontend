@@ -37,6 +37,7 @@ public class LoginPage extends AppCompatActivity {
 
         inputEmail = findViewById(R.id.emailInput);
         inputPassword = findViewById(R.id.passwordInput);
+
     }
 
     public void initWebSocket() {
@@ -64,7 +65,10 @@ public class LoginPage extends AppCompatActivity {
         Intent intent = new Intent(LoginPage.this, MainActivity.class);
         intent.putExtra("email", email);
         intent.putExtra("password", password);
+        inputEmail.setText("");
+        inputPassword.setText("");
         startActivity(intent);
+        finish();
 
 
         /*try {
