@@ -2,6 +2,7 @@ package com.example.friendlist;
 
 import static java.lang.Thread.sleep;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -59,7 +60,10 @@ public class LoginPage extends AppCompatActivity {
         Log.d("Login", "已取得email: " + email +" 密码: " + password);
 
         // 测试页面跳转
-
+        Intent intent = new Intent(LoginPage.this, MainActivity.class);
+        intent.putExtra("email", email);
+        intent.putExtra("password", password);
+        startActivity(intent);
         /*try {
             // 诶? 好像UG的前端Api里面还没有登录的方法
             sleep(600);

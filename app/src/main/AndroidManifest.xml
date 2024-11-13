@@ -8,9 +8,9 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:icon="@drawable/baseline_sports_volleyball_24"
+        android:label="Chatnexus"
+        android:roundIcon="@drawable/baseline_sports_volleyball_24"
         android:supportsRtl="true"
         android:theme="@style/Theme.Friendlist"
         tools:targetApi="31">

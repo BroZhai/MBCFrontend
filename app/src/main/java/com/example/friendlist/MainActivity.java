@@ -1,6 +1,9 @@
 package com.example.friendlist;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,12 +18,20 @@ import com.example.friendlist.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
+    String loginEmail;
+    String loginPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        loginEmail = getIntent().getStringExtra("email");
+        loginPassword = getIntent().getStringExtra("password");
+        Log.d("MainPage", "主页已取得登录email: " + loginEmail +" 登录密码: " + loginPassword);
+        Toast.makeText(MainActivity.this, "Welcome back! " + loginEmail, Toast.LENGTH_SHORT).show();
+
         // Set the default fragment_page for the first time entry
         replaceFragment(new MessageFragment());
 
