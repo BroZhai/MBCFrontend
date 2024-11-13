@@ -1,6 +1,7 @@
 package com.example.friendlist;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -30,7 +31,14 @@ public class MainActivity extends AppCompatActivity {
         loginEmail = getIntent().getStringExtra("email");
         loginPassword = getIntent().getStringExtra("password");
         Log.d("MainPage", "主页已取得登录email: " + loginEmail +" 登录密码: " + loginPassword);
-        Toast.makeText(MainActivity.this, "Welcome back! " + loginEmail, Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.this, "Login Success! Welcome back, " + loginEmail, Toast.LENGTH_SHORT).show();
+
+        // 测试能否读取SharedPreferences存的登录数据
+        SharedPreferences sp = getSharedPreferences("userdata", MODE_PRIVATE);
+        String email = sp.getString("email", "null");
+        String password = sp.getString("password", "null");
+        boolean loginStatus = sp.getBoolean("loginStatus", false);
+        Log.d("MainPage", "尝试从SharedPreferences中获取的email:" + email +" 密码:" + password + " 登录状态为:" + loginStatus);
 
         // Set the default fragment_page for the first time entry
         replaceFragment(new MessageFragment());

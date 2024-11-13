@@ -3,6 +3,7 @@ package com.example.friendlist;
 import static java.lang.Thread.sleep;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -38,6 +39,16 @@ public class LoginPage extends AppCompatActivity {
         inputPassword = findViewById(R.id.passwordInput);
     }
 
+    public void storeUserData(String email, String password) {
+        // 将用户数据保存至SharedPreferences方法
+        SharedPreferences sp = getSharedPreferences("userdata", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("email", email);
+        editor.putString("password", password);
+        editor.putBoolean("loginStatus",true);
+        editor.apply();
+    }
+
     public void initWebSocket() {
         try {
             URI uri = new URI("ws://10.0.2.2:8080/backend-api");
@@ -59,11 +70,16 @@ public class LoginPage extends AppCompatActivity {
         Toast.makeText(LoginPage.this, "已取得email: " + email +" 密码: " + password, Toast.LENGTH_SHORT).show();
         Log.d("Login", "已取得email: " + email +" 密码: " + password);
 
+        // 假设成功登录，保存用户登录信息至SharedPreferences
+        storeUserData(email, password);
+
         // 测试页面跳转
         Intent intent = new Intent(LoginPage.this, MainActivity.class);
         intent.putExtra("email", email);
         intent.putExtra("password", password);
         startActivity(intent);
+
+
         /*try {
             // 诶? 好像UG的前端Api里面还没有登录的方法
             sleep(600);
