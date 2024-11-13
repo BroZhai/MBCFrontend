@@ -28,20 +28,24 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // 从'登录页'获取登录数据 (非'SharedPreferences')
         loginEmail = getIntent().getStringExtra("email");
         loginPassword = getIntent().getStringExtra("password");
-        Log.d("IntentReceiver", "主页已取得登录email: " + loginEmail +" 登录密码: " + loginPassword);
-        Toast.makeText(MainActivity.this, "Login Success! Welcome back, " + loginEmail, Toast.LENGTH_SHORT).show();
 
         // 用户成功登录来到此页，存储用户登录信息
         storeUserData(loginEmail, loginPassword);
 
-        // 测试能否读取SharedPreferences存的登录数据
+        // 立即读取SharedPreferences存的登录数据 (看是否正确存储)
         SharedPreferences sp = getSharedPreferences("userdata", MODE_PRIVATE);
         String email = sp.getString("email", "null");
         String password = sp.getString("password", "null");
         boolean loginStatus = sp.getBoolean("loginStatus", false);
         Log.d("MainPageSP", "尝试从SharedPreferences中获取的email:" + email +" 密码:" + password + " 登录状态为:" + loginStatus);
+
+        Log.d("Intent", "主页已取得登录email: " + email +" 登录密码: " + password);
+        Toast.makeText(MainActivity.this, "Login Success! Welcome back, " + email, Toast.LENGTH_SHORT).show();
+
+
 
         // Set the default fragment_page for the first time entry
         replaceFragment(new MessageFragment());

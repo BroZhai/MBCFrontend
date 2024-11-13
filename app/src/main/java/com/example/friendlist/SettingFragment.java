@@ -75,9 +75,9 @@ public class SettingFragment extends Fragment {
              public void onClick(View v) {
                  Toast.makeText(getActivity(),userEmail + " 现已登出", Toast.LENGTH_SHORT).show();
                  // 用户登出，清除SharedPreferences里面的用户登录信息
-                 editor.clear();
+                 editor.putBoolean("loginStatus", false);
                  editor.apply();
-                 Log.d("SharedPreferences", "用户数据已清除");
+                 Log.d("SharedPreferences", "用户数据已登出");
 
                  // 跳转回登录页面
                  Intent intent = new Intent(getActivity(), LoginPage.class);
