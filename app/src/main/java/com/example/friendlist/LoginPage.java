@@ -30,6 +30,7 @@ public class LoginPage extends AppCompatActivity {
      EditText inputPassword;
      FrontendAPIProvider websocket;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -2,6 +2,7 @@ package com.example.friendlist;
 
 import static java.lang.Thread.sleep;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -138,6 +139,8 @@ public class AddContactFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_add_contact, container, false);
         EditText input_email = view.findViewById(R.id.emailReq);
         Button sendBtn = view.findViewById(R.id.sendReq);
+        SharedPreferences sp = getContext().getSharedPreferences("userdata", getContext().MODE_PRIVATE);
+        String currentUid = sp.getString("uid", "null");
 
         initWebSocket(); // 创建该界面时，初始化WebSocket并尝试建立连接
 
@@ -153,8 +156,7 @@ public class AddContactFragment extends Fragment {
                     // Send request to the email
                     Log.d("WebSocketRegisiter", "程序已执行至96行，输入的邮箱为: " + emailStr);
                     try {
-                        String temp_uid = "184bc12a-2b5e-41a4-8342-d997ca0e7666";
-                        websocket.addNewFriend(temp_uid,emailStr);
+                        websocket.addNewFriend(currentUid, emailStr);
                         sleep(600);
                         if(websocket.success){
                             Toast.makeText(getContext(), "好友请求已成功发至: " + emailStr, Toast.LENGTH_SHORT).show();
@@ -186,7 +188,6 @@ public class AddContactFragment extends Fragment {
             websocket.close();
         }
     }
-
 
 
     public void clearPendingRequests(){
