@@ -4,8 +4,8 @@ public class UserRequest extends User{
 
     private boolean pending=true;
 
-    public UserRequest(String name, String email, String address) {
-        super(name, email, address);
+    public UserRequest(String name, String email, String uid) {
+        super(name, email, uid);
     }
 
     public void acceptRequest(){

@@ -3,13 +3,13 @@ package com.example.friendlist;
 public class User {
     private String name;
     private String email;
-    private String address;
+    private String uid;
     public boolean isFriend;
 
-    public User(String name, String email, String address) {
+    public User(String name, String email, String uid) {
         this.name = name;
         this.email = email;
-        this.address = address;
+        this.uid = uid;
     }
 
     public String getName() {
@@ -20,10 +20,13 @@ public class User {
         return email;
     }
 
-    public String getAddress() {
-        return address;
+    public String getUid() {
+        return uid;
     }
 
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
 
 
 }

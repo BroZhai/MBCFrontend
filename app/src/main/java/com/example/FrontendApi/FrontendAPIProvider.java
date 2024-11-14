@@ -25,6 +25,8 @@ public class FrontendAPIProvider extends WebSocketClient {
     public String email;
     public String cid; //目前对话的id
 
+    // 修改了前端这里的API，我需要用到这个response json文件，就把他单独摘出来了
+    public JSONObject response = null;
 
     // 构造函数，初始化 WebSocket 客户端
     public FrontendAPIProvider(URI serverURI) {
@@ -48,7 +50,7 @@ public class FrontendAPIProvider extends WebSocketClient {
     // 接收并处理来自服务器的消息
     @Override
     public void onMessage(String message) {
-        JSONObject response = null;
+
         try {
             response = new JSONObject(message);
         } catch (JSONException e) {
