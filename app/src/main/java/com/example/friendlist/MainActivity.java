@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("MainPageSP", "尝试从SharedPreferences中获取的email:" + email +" 密码:" + password + " 登录状态为:" + loginStatus);
 
         Log.d("Intent", "主页已取得登录email: " + email +" 登录密码: " + password);
-        Toast.makeText(MainActivity.this, "Login Success! Welcome back, " + email, Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.this, "Welcome back, " + email, Toast.LENGTH_SHORT).show();
 
 
 

@@ -38,19 +38,38 @@ public class LoginPage extends AppCompatActivity {
         inputEmail = findViewById(R.id.emailInput);
         inputPassword = findViewById(R.id.passwordInput);
 
+        initWebSocket();
+        try {
+            sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
         // 尝试通过读取SharedPreferences实现'自动登录'
         SharedPreferences sp = getSharedPreferences("userdata", MODE_PRIVATE);
         if(sp!=null && sp.getBoolean("loginStatus", false)) {
             String email = sp.getString("email", "null");
             String password = sp.getString("password", "null");
             Log.d("AutoLogin", "\""+email+"\"自动登录中...");
-            Toast.makeText(LoginPage.this, "\""+email+"\"自动登录中...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(LoginPage.this, "\""+email+"\" trying auto login...", Toast.LENGTH_SHORT).show();
             // 测试页面跳转
-            Intent intent = new Intent(LoginPage.this, MainActivity.class);
-            intent.putExtra("email", email);
-            intent.putExtra("password", password);
-            startActivity(intent);
-            finish();
+            try {
+                websocket.login(email, password);
+                sleep(600);
+                if(websocket.success) {
+                    Log.d("AutoLoginResponse", "自动登录成功!");
+                    Intent intent = new Intent(LoginPage.this, MainActivity.class);
+                    intent.putExtra("email", email);
+                    intent.putExtra("password", password);
+                    startActivity(intent);
+                    finish();
+                }else{
+                    Log.e("AutoLoginResponse", "自动登录失败");
+                }
+            } catch (JSONException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
         }
     }
 
@@ -74,32 +93,33 @@ public class LoginPage extends AppCompatActivity {
         }
 //        Toast.makeText(LoginPage.this, "已取得email: " + email +" 密码: " + password, Toast.LENGTH_SHORT).show();
         Log.d("Login", "已取得email: " + email +" 密码: " + password);
-
-        // 测试页面跳转
-        Intent intent = new Intent(LoginPage.this, MainActivity.class);
-        intent.putExtra("email", email);
-        intent.putExtra("password", password);
-        inputEmail.setText("");
-        inputPassword.setText("");
-        startActivity(intent);
-        finish();
-
-
-        /*try {
-            // 诶? 好像UG的前端Api里面还没有登录的方法
+        try {
+            websocket.login(email, password);
             sleep(600);
             if(websocket.success) {
                 Toast.makeText(LoginPage.this, "Login success", Toast.LENGTH_SHORT).show();
-                Log.d("Login", "登录成功");
+                Log.d("LoginResponse", "登录成功");
+
+                // 测试页面跳转
+                Intent intent = new Intent(LoginPage.this, MainActivity.class);
+                intent.putExtra("email", email);
+                intent.putExtra("password", password);
+                inputEmail.setText("");
+                inputPassword.setText("");
+                startActivity(intent);
+                finish();
+
             } else {
-                Toast.makeText(LoginPage.this, "Login failed", Toast.LENGTH_SHORT).show();
-                Log.d("Login", "登录失败");
+                Toast.makeText(LoginPage.this, "Login failed, email or password error", Toast.LENGTH_SHORT).show();
+                Log.e("LoginResponse", "登录失败");
             }
         } catch (JSONException e) {
             throw new RuntimeException(e);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }*/
+        }
+
+
     }
 
     public void goRegister(View view) {
