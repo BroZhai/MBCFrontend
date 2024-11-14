@@ -118,10 +118,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="12sp" />
-
         <TextView
             android:text="2024 Mobile Computing Group 4 All rights reserved"
-            android:layout_marginTop="180sp"
+            android:layout_marginTop="40dp"
             android:textSize="16sp"
             android:textAlignment="center"
             android:layout_width="wrap_content"
