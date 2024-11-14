@@ -66,7 +66,7 @@ public class RegisterPage extends AppCompatActivity {
         } else {
             Log.d("RegisterPage", "用户正在注册，用户名: " + username + " 邮箱: " + email + " 密码: " + password);
             websocket.register(username, email, password);
-
+            sleep(600);
             if (websocket.success) {
                 Toast.makeText(RegisterPage.this, "Register Success! " + username, Toast.LENGTH_SHORT).show();
                 Log.d("RegisterSuccess", "用户注册成功，用户名: " + username + " 邮箱: " + email + " 密码: " + password);
