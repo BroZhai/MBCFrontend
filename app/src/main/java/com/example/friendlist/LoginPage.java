@@ -97,7 +97,7 @@ public class LoginPage extends AppCompatActivity {
             websocket.login(email, password);
             sleep(600);
             if(websocket.success) {
-                Toast.makeText(LoginPage.this, "Login success", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginPage.this, "Logging...", Toast.LENGTH_SHORT).show();
                 Log.d("LoginResponse", "登录成功");
 
                 // 测试页面跳转

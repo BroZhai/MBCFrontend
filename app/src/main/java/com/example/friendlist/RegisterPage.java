@@ -75,7 +75,7 @@ public class RegisterPage extends AppCompatActivity {
                 regPassword.setText("");
                 finish();
             } else {
-                Toast.makeText(RegisterPage.this, "Register Failed! Please try again!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RegisterPage.this, "Register Failed! Email maybe duplicated!", Toast.LENGTH_SHORT).show();
                 Log.e("RegisterFailure", "用户注册失败");
             }
         }
