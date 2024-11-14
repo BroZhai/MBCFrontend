@@ -40,7 +40,7 @@ public class LoginPage extends AppCompatActivity {
 
         // 尝试通过读取SharedPreferences实现'自动登录'
         SharedPreferences sp = getSharedPreferences("userdata", MODE_PRIVATE);
-        if(sp!=null && sp.getBoolean("loginStatus", true)) {
+        if(sp!=null && sp.getBoolean("loginStatus", false)) {
             String email = sp.getString("email", "null");
             String password = sp.getString("password", "null");
             Log.d("AutoLogin", "\""+email+"\"自动登录中...");
