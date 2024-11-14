@@ -11,6 +11,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="-660dp"
         android:text="Go Back"
+        android:onClick="goBack"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -110,7 +111,8 @@
                 android:layout_height="50dp"
                 android:ems="10"
                 android:textStyle="italic"
-                android:hint="please set your password">
+                android:hint="please set your password"
+                android:inputType="textPassword">
 
             </EditText>
         </LinearLayout>
@@ -120,7 +122,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="70dp"
-            android:onClick=""
+            android:onClick="sendRegisterRequest"
             android:text="Register" />
 
     </LinearLayout>

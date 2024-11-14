@@ -101,4 +101,9 @@ public class LoginPage extends AppCompatActivity {
             throw new RuntimeException(e);
         }*/
     }
+
+    public void goRegister(View view) {
+        Intent intent = new Intent(LoginPage.this, RegisterPage.class);
+        startActivity(intent);
+    }
 }

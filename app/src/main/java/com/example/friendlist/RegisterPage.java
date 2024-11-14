@@ -1,7 +1,12 @@
 package com.example.friendlist;
 
+import static java.lang.Thread.sleep;
+
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,6 +15,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.FrontendApi.FrontendAPIProvider;
+
+import org.json.JSONException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -29,6 +36,7 @@ public class RegisterPage extends AppCompatActivity {
         regUsername = findViewById(R.id.reg_username);
         regEmail = findViewById(R.id.reg_email);
         regPassword = findViewById(R.id.reg_password);
+        initWebSocket();
     }
 
 
@@ -42,11 +50,34 @@ public class RegisterPage extends AppCompatActivity {
         }
     }
 
+    public void goBack(View view) {
+        finish();
+    }
 
-    public void sendRegisterRequest() {
+
+    public void sendRegisterRequest(View view) throws JSONException, InterruptedException {
 
         // Send register request to backend
-        initWebSocket();
+        String username = regUsername.getText().toString().trim();
+        String email = regEmail.getText().toString().trim();
+        String password = regPassword.getText().toString().trim();
+        if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(RegisterPage.this, "Please fill in all the fields!", Toast.LENGTH_SHORT).show();
+        } else {
+            Log.d("RegisterPage", "用户正在注册，用户名: " + username + " 邮箱: " + email + " 密码: " + password);
+            websocket.register(username, email, password);
 
+            if (websocket.success) {
+                Toast.makeText(RegisterPage.this, "Register Success! " + username, Toast.LENGTH_SHORT).show();
+                Log.d("RegisterSuccess", "用户注册成功，用户名: " + username + " 邮箱: " + email + " 密码: " + password);
+                regUsername.setText("");
+                regEmail.setText("");
+                regPassword.setText("");
+                finish();
+            } else {
+                Toast.makeText(RegisterPage.this, "Register Failed! Please try again!", Toast.LENGTH_SHORT).show();
+                Log.e("RegisterFailure", "用户注册失败");
+            }
+        }
     }
 }
