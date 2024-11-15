@@ -65,6 +65,7 @@ public class LoginPage extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 }else{
+                    Toast.makeText(LoginPage.this, "Auto login failed, please try again!", Toast.LENGTH_SHORT).show();
                     Log.e("AutoLoginResponse", "自动登录失败");
                 }
             } catch (JSONException | InterruptedException e) {
