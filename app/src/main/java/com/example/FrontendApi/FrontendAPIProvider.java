@@ -380,6 +380,7 @@ public class FrontendAPIProvider extends WebSocketClient {
         System.out.println("[→][Client] Sent add new friend request: " + addNewFriendRequest);
     }
 
+    // Todo: 待和UG这个方法，我需要看后台数据库pwp
     public void isFriendRequestAccept(String uid, String fid,String status) throws JSONException {
         JSONObject isFriendRequestAcceptRequest = new JSONObject();
         isFriendRequestAcceptRequest.put("action", "isFriendRequestAccept");
@@ -391,6 +392,7 @@ public class FrontendAPIProvider extends WebSocketClient {
         System.out.println("[→][Client] Sent is friend request accept request: " + isFriendRequestAcceptRequest);
     }
 
+    // Todo: 同上
     public void deleteFriend(String uid, String fid) throws JSONException {
         JSONObject deleteFriendRequest = new JSONObject();
         deleteFriendRequest.put("action", "deleteFriend");
