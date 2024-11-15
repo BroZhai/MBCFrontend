@@ -35,6 +35,7 @@ public class AddContactFragment extends Fragment {
 
     FrontendAPIProvider websocket;
     ArrayList<UserRequest> requestArray = new ArrayList<>();
+
     ListView lv;
     TextView showNothing;
 
@@ -102,7 +103,9 @@ public class AddContactFragment extends Fragment {
 
         // 手动添加一个默认的'好友申请'item
         UserRequest request1 = new UserRequest("Alice", "Alice@email.com",currentUid ,"184bc12a-2b5e-41a4-8342-d997ca0e7666");
+        UserRequest request2 = new UserRequest("Bob", "bob@bombmail.com",currentUid ,"184bc12a-2b5e-41a4-8342-d997ca0e7666");
         requestArray.add(request1);
+        requestArray.add(request2);
 
 
         if(requestArray.isEmpty()){
@@ -115,7 +118,9 @@ public class AddContactFragment extends Fragment {
             showNothing.setVisibility(View.GONE);
             MyAdapter adapter = new MyAdapter();
             lv.setAdapter(adapter);
-        }
+            }
+
+
 
         initWebSocket(); // 创建该界面时，初始化WebSocket并尝试建立连接
 
@@ -210,10 +215,22 @@ public class AddContactFragment extends Fragment {
             Button acceptBtn = (Button) item_view.findViewById(R.id.acceptBtn);
             Button declineBtn = (Button) item_view.findViewById(R.id.declineBtn);
 
-            //3. 根据"原数据"设置各个控件的'展示数据'
-            capital.setText(requestArray.get(i).getName().substring(0,1));
-            nameString.setText(requestArray.get(i).getName());
+            String requesterName = requestArray.get(i).getName();
 
+            //3. 根据"原数据"设置各个控件的'展示数据'
+            capital.setText(requesterName.substring(0,1));
+            nameString.setText(requesterName);
+
+            //3.5 在这里设置'各个item按钮'的监听器
+            acceptBtn.setOnClickListener(new View.OnClickListener() { //接受好友请求
+                @Override
+                public void onClick(View view) {
+                    // Accept the request
+//                    requestArray.get(i).acceptRequest();
+                    Toast.makeText(getContext(), "Accepted request from: " + requesterName  , Toast.LENGTH_SHORT).show();
+                    Log.d("AcceptButton", "已接受好友请求" + requesterName);
+                }
+            });
 
             //4. 返回该View对象 (这样以后，这个Adapter就算建立好了，接下来将这个"格式"应用到listView控件中去)
             return item_view;

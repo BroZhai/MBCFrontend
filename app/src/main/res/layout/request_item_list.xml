@@ -22,11 +22,11 @@
                 android:gravity="center"
                 android:text="K"/>
 
-            <TextView
-                android:id="@+id/nameStr"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="23sp"
+        <TextView
+            android:id="@+id/nameStr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="23sp"
                 android:layout_marginLeft="34sp"
                 android:layout_toRightOf="@id/capLetter"
                 android:layout_marginTop="15sp"
