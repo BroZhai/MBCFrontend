@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="60sp"
         android:text="friendNameDisplay"
-        android:textSize="26sp"
+        android:textSize="20sp"
         android:gravity="center"
         android:background="#83d0ff"
         />
@@ -24,6 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:text="Back"
+        android:onClick="exitChat"
         />
     </FrameLayout>
 
@@ -46,6 +47,7 @@
             android:layout_height="match_parent"
             android:orientation="horizontal">
             <EditText
+                android:id="@+id/bufferMsg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Enter your message here..."
@@ -54,7 +56,9 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="send"/>
+                android:text="send"
+                android:onClick="sendMessage"
+                />
         </LinearLayout>
 
     </FrameLayout>

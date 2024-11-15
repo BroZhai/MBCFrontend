@@ -1,7 +1,11 @@
 package com.example.friendlist;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -32,7 +36,6 @@ public class ContactFragment extends Fragment {
             "Pinkcandy Zhou", "DanielL 04", "Rokidna UG",
             "Ice Wings","Joy Project", "White sheep",
             "Dreamland Palesky","Sliver Cat", "多摩 aac1"};
-    List<String> fname = Arrays.asList(friendName);
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -86,11 +89,20 @@ public class ContactFragment extends Fragment {
         ListView listView = view.findViewById(R.id.contactListView);
         listView.setAdapter(new MyAdapter());
 
+        // 读取SharedPreferences中的'本地用户数据' (目前只要了uid, 其他要的后面再加)
+        SharedPreferences sp = getActivity().getSharedPreferences("userdata", MODE_PRIVATE);
+        String selfID = sp.getString("uid", "null");
+
         // 设置短按item的监听器
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Toast.makeText(ContactFragment.this.getActivity(), "You've clicked " + friendList.get(i).getName(), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(ContactFragment.this.getActivity(), ChatPage.class);
+                intent.putExtra("friendName", friendList.get(i).getName());
+                intent.putExtra("friendID", friendList.get(i).getUid());
+                intent.putExtra("selfID", selfID);
+                startActivity(intent);
             }
         });
 
