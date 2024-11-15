@@ -173,7 +173,18 @@ public class AddContactFragment extends Fragment {
     public void clearPendingRequests(){
         for(int i=0; i<requestArray.size(); i++){
             if(requestArray.get(i).isPending()==false){
+                Log.d("ClearPendingRequests", "已清除:"+ requestArray.get(i).getName() +"的好友请求");
                 requestArray.remove(i);
+                if(requestArray.isEmpty()){
+                    lv.setVisibility(View.GONE);
+                    showNothing.setVisibility(View.VISIBLE);
+                }else {
+                    //更新前端的ListView显示
+                    lv.setVisibility(View.VISIBLE);
+                    showNothing.setVisibility(View.GONE);
+                    MyAdapter adapter = new MyAdapter();
+                    lv.setAdapter(adapter);
+                }
             }
         }
     }
@@ -199,7 +210,7 @@ public class AddContactFragment extends Fragment {
         @Override
         //重点: 获取每一个item的'展示样式' (单独开个layout文件设置每个Item的样式)
         public View getView(int i, View view, ViewGroup viewGroup) {
-            //参数说明: i (item的下标位置)，
+            //参数说明: i (item的下标位置)，用于定位'各个item'
             //view (缓存着'划出视野'的item, 优化listView用)
             //viewGroup (listView对象本身，用的少)
 
@@ -228,7 +239,24 @@ public class AddContactFragment extends Fragment {
                     // Accept the request
 //                    requestArray.get(i).acceptRequest();
                     Toast.makeText(getContext(), "Accepted request from: " + requesterName  , Toast.LENGTH_SHORT).show();
-                    Log.d("AcceptButton", "已接受好友请求" + requesterName);
+                    Log.d("AcceptButton", "已接受好友请求:" + requesterName);
+                    requestArray.get(i).acceptRequest(); // 更新'请求数组'里面的ispending状态，清楚该请求栏
+                    clearPendingRequests();
+
+                    // 尚未将操作提交至服务器
+
+                }
+            });
+
+            declineBtn.setOnClickListener(new View.OnClickListener() { //接受好友请求
+                @Override
+                public void onClick(View view) {
+                    // Accept the request
+//                    requestArray.get(i).acceptRequest();
+                    Toast.makeText(getContext(), "Declined request from: " + requesterName  , Toast.LENGTH_SHORT).show();
+                    Log.d("DeclinedButton", "已拒绝好友请求:" + requesterName);
+                    requestArray.get(i).rejectRequest(); // 同上
+                    clearPendingRequests();
                 }
             });
 
