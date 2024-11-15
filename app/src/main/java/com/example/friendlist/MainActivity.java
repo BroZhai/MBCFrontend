@@ -32,11 +32,13 @@ public class MainActivity extends AppCompatActivity {
     String loginEmail;
     String loginPassword;
     String receivedUid;
+    String receivedUsername;
     boolean autoLoginStatus = false;
 
     User currentUser;
     FrontendAPIProvider websocket;
-    JSONObject serverResponse; // 修改了前端的API，需要一个新的JSONObject来接收返回的数据
+    JSONObject serverResponse; // 修改了前端的API，需要一个新的JSONObject来接收返回的(用户)数据
+    // 给服务器丢个邮箱，会返回对应 用户的json数据(email, password, uid)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,31 +64,33 @@ public class MainActivity extends AppCompatActivity {
             loginEmail = getIntent().getStringExtra("email");
             loginPassword = getIntent().getStringExtra("password");
 
-            // 向服务器请求用户uid
+            // 向服务器请求用户uid (通过邮箱)
             try {
                 websocket.getUserInfoByEmail(loginEmail);
                 sleep(600);
                 serverResponse = websocket.response;
                 receivedUid = serverResponse.getString("uid");
-                Log.d("JsonReceivedUid", "获取到的当前用户的uid为: " + receivedUid);
+                receivedUsername = serverResponse.getString("uname");
+                Log.d("JsonReceivedUid", "获取到的当前用户的uid为: " + receivedUid + ", 用户名为: " + receivedUsername);
             } catch (JSONException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            // 根据已有的数据创建一个新的用户对象，同时准备存储到SharedPreferences中
-            currentUser = new User(loginEmail, loginPassword, receivedUid);
-            storeUserData(loginEmail, loginPassword, receivedUid);
-            Log.d("Intent", "主页已取得登录 email:" + loginEmail +", 登录密码:" + loginPassword + ", 首次从服务器请求回的uid:" + receivedUid);
-            Toast.makeText(MainActivity.this, "Welcome back, " + loginEmail, Toast.LENGTH_SHORT).show();
+            // 根据已有的数据创建一个新的用户对象，同时准备存储到SharedPreferences中 User(name, email, uid)
+            currentUser = new User(receivedUsername, loginEmail, receivedUid);  // 不用password
+            storeUserData(receivedUsername, loginEmail, loginPassword, receivedUid);
+            Log.d("Intent", "主页已取得登录用户名:" + receivedUsername +", 登录密码:" + loginPassword + ", 首次从服务器请求回的uid:" + receivedUid);
+            Toast.makeText(MainActivity.this, "Welcome back, " + receivedUsername, Toast.LENGTH_SHORT).show();
         }else{
             // 立即读取SharedPreferences存的登录数据 (直接读取已有数据，不再从Intent中获取 和 向服务器请求)
             Log.d("AutoLoginStatus", "检测到SharedPreferences中已有用户数据，将自动读取...");
+            String username = sp.getString("username", "null");
             String email = sp.getString("email", "null");
             String password = sp.getString("password", "null");
             String uid = sp.getString("uid", "null");
             boolean loginStatus = sp.getBoolean("loginStatus", false); // 好像有点多此一举，但是先留着
-            Log.d("MainPageSP", "尝试从SharedPreferences中获取的 email:" + email +", 密码:" + password + ",  用户Uid:"+ uid+", 登录状态为:" + loginStatus);
+            Log.d("MainPageSP", "尝试从SharedPreferences中获取的 用户名:" + username +", 密码:" + password + ",  用户Uid:"+ uid+", 登录状态为:" + loginStatus);
             currentUser = new User(email, password, uid);
-            Toast.makeText(MainActivity.this, "Welcome back, " + email, Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "Welcome back, " + username, Toast.LENGTH_SHORT).show();
         }
 
 
@@ -127,10 +131,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Save user login data once successfully login
-    public void storeUserData(String email, String password, String uid) {
+    public void storeUserData(String uname,String email, String password, String uid) {
         // 将用户数据保存至SharedPreferences方法
         SharedPreferences sp = getSharedPreferences("userdata", MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
+        editor.putString("username", uname);
         editor.putString("email", email);
         editor.putString("password", password);
         editor.putString("uid", uid);
