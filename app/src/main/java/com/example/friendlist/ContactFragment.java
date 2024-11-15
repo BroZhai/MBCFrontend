@@ -16,6 +16,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -30,6 +32,8 @@ public class ContactFragment extends Fragment {
             "Pinkcandy Zhou", "DanielL 04", "Rokidna UG",
             "Ice Wings","Joy Project", "White sheep",
             "Dreamland Palesky","Sliver Cat", "多摩 aac1"};
+    List<String> fname = Arrays.asList(friendName);
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -75,6 +79,9 @@ public class ContactFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
+        fillArray(); // 暂时的方法，将所有的静态list存到Arraylist中，好实现一会儿的"删除"+视图更新
+
         View view = inflater.inflate(R.layout.fragment_contact, container, false);
         ListView listView = view.findViewById(R.id.contactListView);
         listView.setAdapter(new MyAdapter());
@@ -83,7 +90,7 @@ public class ContactFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(ContactFragment.this.getActivity(), "You've clicked " + friendName[i], Toast.LENGTH_SHORT).show();
+                Toast.makeText(ContactFragment.this.getActivity(), "You've clicked " + friendList.get(i).getName(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -95,20 +102,26 @@ public class ContactFragment extends Fragment {
                 // 可以在这里使用item对象进行后续操作
                 AlertDialog.Builder bdr = new AlertDialog.Builder(ContactFragment.this.getActivity());
                 // 创建一个弹窗的"建立对象", "()"内传入Activity(作用的上下文对象)
-                bdr.setCancelable(false); // 设置是否可以通过"点击对话框外部"取消对话框
+                bdr.setCancelable(true); // 设置是否可以通过"点击对话框外部"取消对话框
 
                 bdr.setTitle("Delete Friend"); // 设置对话框标题
-                bdr.setMessage("Are you sure to delete " + friendName[position] + "?"); // 设置对话框内容
+                bdr.setMessage("Are you sure to delete " + friendList.get(position).getName() + "?"); // 设置对话框内容
                 bdr.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+                    // 卧槽，很新的参数用法，这个"_"是用来占位的，表示"我不需要这个参数"
+
+                    // 在此之后，我们就可以直接用 最外面的'position'来进行item定位了
+                    public void onClick(DialogInterface dialogInterface, int _) {
                         Toast.makeText(ContactFragment.this.getActivity(), "You've canceled the deletion", Toast.LENGTH_SHORT).show();
                     }
                 });
                 bdr.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Toast.makeText(ContactFragment.this.getActivity(), "You've deleted " + friendName[position], Toast.LENGTH_SHORT).show();
+                    public void onClick(DialogInterface dialogInterface, int _) {
+                        // 删除好友item 并 更新视图
+                        Toast.makeText(ContactFragment.this.getActivity(), "You've deleted " + friendList.get(position).getName(), Toast.LENGTH_SHORT).show();
+                        friendList.remove(position);
+                        listView.setAdapter(new MyAdapter());
                     }
                 });
 
@@ -123,16 +136,27 @@ public class ContactFragment extends Fragment {
         return view;
     }
 
+    // 用于填充Arraylist的方法（暂用，里面填的是User对象）
+    public void fillArray(){
+        // User(name,email,uid);
+        User u1 = new User("Rokidna UG","u1mail","aaf57298-8de9-4bd1-8ffe-4830f0926e4d");
+        User u2 = new User("PinkCandy Zhou","u2mail","8faa8b99-0e47-4f9e-a5cd-23273cd9ce46");
+        User u3 = new User("China Boy","u3mail","e43fd95d-2a61-4c14-9299-32633cd17ab4");
+        User u4 = new User("Vvokos","u4mail","3964a988-8b32-42f3-9d11-14b75eb1b925");
+        List<User> temp = Arrays.asList(u1,u2,u3,u4);
+        friendList.addAll(temp);
+    }
+
     class MyAdapter extends BaseAdapter {
         //对于每个Adapter，我们都要去重写以下四个方法 (必须重写！)
         @Override
         public int getCount() { // 获取数据的'个数'
-            return friendName.length;
+            return friendList.size();
         }
 
         @Override
         public Object getItem(int i) { //获取具体某个'元素'，上面会传入'下标'进来给你定位
-            return friendName[i];
+            return friendList.get(i);
         }
 
         @Override
@@ -156,8 +180,9 @@ public class ContactFragment extends Fragment {
             //Tips: priceLable不用动(设置)，它就是放在那里展示的
 
             //3. 根据"原数据"设置各个控件的'展示数据'
-            capital.setText(friendName[i].substring(0,1));
-            nameString.setText(friendName[i]);
+            String fName = friendList.get(i).getName();
+            capital.setText(fName.substring(0,1));
+            nameString.setText(fName);
 
             //4. 返回该View对象 (这样以后，这个Adapter就算建立好了，接下来将这个"格式"应用到listView控件中去)
             return item_view;
