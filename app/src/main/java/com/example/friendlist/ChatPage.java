@@ -10,13 +10,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 public class ChatPage extends AppCompatActivity {
 
@@ -24,13 +22,21 @@ public class ChatPage extends AppCompatActivity {
     String friendUid;
     String myUid;
     String myName;
-    ArrayList<Message> messageList = new ArrayList<>();
+//    ArrayList<Message> messageList = new ArrayList<>();
     ListView msgListView;
+    MessageList messageList = new MessageList();
+    MessageObserver msgObserver = new MessageObserver();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.self_chatbox_page);
+
+        messageList = new MessageList();
+        msgObserver = new MessageObserver();
+        messageList.addObserver(msgObserver);
+
         SharedPreferences sp = getSharedPreferences("userdata", MODE_PRIVATE); // 从SP中读'本地用户'的用户名
         friendName = getIntent().getStringExtra("friendName");
         friendUid = getIntent().getStringExtra("friendUid");
@@ -54,8 +60,8 @@ public class ChatPage extends AppCompatActivity {
         }else {
             Message newMsg = new Message(myUid, friendUid, msg);
             newMsg.setFriendMsg(false);
-            messageList.add(newMsg); // 将'发送消息'添加到'消息列表messageList'
-            updateMessageView();
+            messageList.addMsg(newMsg); // 将'发送消息'添加到'消息列表messageList'
+//            updateMessageView(); // 理论上来说，当messageList发生变化时，相应的Observer就会更新视图
 
             Toast.makeText(this, "Message sent!", Toast.LENGTH_SHORT).show();
             messageField.setText("");
@@ -86,17 +92,53 @@ public class ChatPage extends AppCompatActivity {
         finish();
     }
 
+    // '真正的'消息列表 (被Observer监视的对象)
+    public class MessageList extends Observable {
+        private ArrayList<Message> list = new ArrayList<>();
+
+        public ArrayList<Message> getMsgList() {
+            return list;
+        }
+
+        public void addMsg(Message message){
+            list.add(message);
+            setChanged();
+            notifyObservers();
+        }
+
+        public void removeAll(){
+            list.clear();
+            setChanged();
+            notifyObservers();
+        }
+
+        public int getSize(){
+            return list.size();
+        }
+    }
+
+    public class MessageObserver implements Observer {
+        @Override
+        public void update(Observable o, Object arg) {
+            if (o instanceof MessageList) {
+                System.out.println("检测到消息列表中有新消息，已更新");
+//                updateMessageView();
+                ((MyAdapter)msgListView.getAdapter()).updateData();
+            }
+        }
+    }
+
 
     class MyAdapter extends BaseAdapter {
         //对于每个Adapter，我们都要去重写以下四个方法 (必须重写！)
         @Override
         public int getCount() { // 获取数据的'个数'
-            return messageList.size();
+            return messageList.getMsgList().size();
         }
 
         @Override
         public Object getItem(int i) { //获取具体某个'元素'，上面会传入'下标'进来给你定位
-            return messageList.get(i);
+            return messageList.getMsgList().get(i);
         }
 
         @Override
@@ -120,7 +162,7 @@ public class ChatPage extends AppCompatActivity {
             //Tips: priceLable不用动(设置)，它就是放在那里展示的
 
             //3. 根据"原数据"设置各个控件的'展示数据'
-            boolean isFriendMsg = messageList.get(i).isFriendMsg();
+            boolean isFriendMsg = messageList.getMsgList().get(i).isFriendMsg();
             if (isFriendMsg){
                 // 该消息Item是好友发过来的，设置为 "好友名字的首字母"
                 cap.setText(friendName.substring(0, 1));
@@ -128,10 +170,13 @@ public class ChatPage extends AppCompatActivity {
                 // 是'本地用户'发的
                 cap.setText(myName.substring(0, 1));
             }
-            content.setText(messageList.get(i).getContent());
+            content.setText(messageList.getMsgList().get(i).getContent());
 
-            //4. 返回该View对象 (这样以后，这个Adapter就算建立好了，接下来将这个"格式"应用到listView控件中去)
             return item_view;
         }
+        public void updateData() {
+            notifyDataSetChanged();
+        }
     }
+
 }
