@@ -4,6 +4,7 @@ public class Message {
     private String senderUID;
     private String receiverUID;
     private String content;
+    boolean isFriendMsg = false;
     private String time; // 暂留，可能会用到 (吗?
 
     public Message(String senderUID, String receiverUID, String content) {
@@ -35,5 +36,9 @@ public class Message {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public void isFriend(boolean friendMsg) {
+        isFriendMsg = friendMsg;
     }
 }
