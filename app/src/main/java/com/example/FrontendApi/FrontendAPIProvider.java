@@ -65,7 +65,7 @@ public class FrontendAPIProvider extends WebSocketClient {
                 handleLoginResponse(response);
                 break;
 
-            case "getAllMessages":
+            case "getAllMessage":
                 handleGetAllMessagesResponse(response);
                 break;
 
@@ -77,8 +77,12 @@ public class FrontendAPIProvider extends WebSocketClient {
                 handleGetLatestMessageResponse(response);
                 break;
 
-            case "getConversationID":
-                handleGetConversationIDResponse(response);
+            case "getConversationIDByID":
+                handleGetConversationIDByIDResponse(response);
+                break;
+
+            case "getConversationIDByEmail":
+                handleGetConversationIDByEmailResponse(response);
                 break;
 
             case "addNewFriend":
@@ -114,16 +118,22 @@ public class FrontendAPIProvider extends WebSocketClient {
                 handleIsUserOnlineResponse(response);
                 break;
 
-            case "isFriend":
-                handleIsFriendResponse(response);
+            case "isFriendByEmail":
+                handleIsFriendByEmailResponse(response);
+                break;
+            case "isFriendByUID":
+                handleIsFriendByUIDResponse(response);
                 break;
 
             case "register":
                 handleRegisterResponse(response);
-            case "startConversation":
-                handleGetConversationID(response);
+            case "startConversationByID":
+                handleGetConversationIDByIDResponse(response);
                 break;
 
+            case "startConversationByEmail":
+                handleGetConversationIDByEmailResponse(response);
+                break;
 
 
             //服务器推送给所有客户端
@@ -136,11 +146,18 @@ public class FrontendAPIProvider extends WebSocketClient {
         }
     }
 
-    private void handleIsFriendResponse(JSONObject response) {
+
+
+    private void handleIsFriendByEmailResponse(JSONObject response) {
         success = response.optBoolean("success", false);
         action = response.optString("action");
         System.out.println("[←][Server & Client] Is friend result: " + success);
+    }
 
+    private void handleIsFriendByUIDResponse(JSONObject response) {
+        success = response.optBoolean("success", false);
+        action = response.optString("action");
+        System.out.println("[←][Server & Client] Is friend result: " + success);
     }
 
     private void handleIsUserOnlineResponse(JSONObject response) {
@@ -200,20 +217,25 @@ public class FrontendAPIProvider extends WebSocketClient {
         System.out.println("[←][Server & Client] Is friend request accept result: " + success);
     }
 
-    private void handleGetConversationIDResponse(JSONObject response) {
+
+    private void handleGetConversationIDByIDResponse(JSONObject response) {
         success = response.optBoolean("success", false);
         action = response.optString("action");
         cid = response.optString("cid");
         System.out.println("[←][Server & Client] Get conversation ID result: " + success);
     }
-
-    private void handleGetLatestMessageResponse(JSONObject response) {
+    private void handleGetConversationIDByEmailResponse(JSONObject response) {
         success = response.optBoolean("success", false);
         action = response.optString("action");
-        latest_message = response.optJSONObject("latestMessage");
+        cid = response.optString("cid");
+        System.out.println("[←][Server & Client] Get conversation ID result: " + success);
+    }
+    private void handleGetLatestMessageResponse(JSONObject response) {
+        action = response.optString("action");
+        latest_message = response;
+        System.out.println("Latest message: " + latest_message.toString());
         System.out.println("[←][Server & Client] Get latest message result: " + success);
     }
-
     private void handleSendNewMessageResponse(JSONObject response) {
         success = response.optBoolean("success", false);
         action = response.optString("action");
@@ -226,18 +248,10 @@ public class FrontendAPIProvider extends WebSocketClient {
         all_message = response.optJSONArray("uid");
         System.out.println("[←][Server & Client] Get all messages result: " + success);
     }
-
     private void handleAddNewFriendResponse(JSONObject response) {
         success = response.optBoolean("success", false);
         action = response.optString("action");
         System.out.println("[←][Server & Client] Add new friend result: " + success);
-    }
-
-    private void handleGetConversationID(JSONObject response) {
-        success = response.optBoolean("success", false);
-        action = response.optString("action");
-        cid = response.optString("cid");
-        System.out.println("[←][Server & Client] Start conversation result: " + success);
     }
 
 
@@ -307,16 +321,7 @@ public class FrontendAPIProvider extends WebSocketClient {
         System.out.println("[→][Client] Sent register request: " + registerRequest);
     }
 
-    //    public void sendStartConversationRequest(String uid, String fid, String content) {
-//        JSONObject ConversationRequest = new JSONObject();
-//        ConversationRequest.put("action", "startConversation");
-//        ConversationRequest.put("uid", uid);
-//        ConversationRequest.put("fid", fid);
-//        ConversationRequest.put("content", content);
-//
-//        send(ConversationRequest.toString());  // 发送 JSON 请求
-//        System.out.println("[→][Client] Sent register request: " + ConversationRequest);
-//    }
+
     public void register(String uname, String email, String password) throws JSONException {
         JSONObject registerRequest = new JSONObject();
         registerRequest.put("action", "register");
@@ -337,6 +342,8 @@ public class FrontendAPIProvider extends WebSocketClient {
         send(getAllMessageRequest.toString());  // 发送 JSON 请求
         System.out.println("[→][Client] Sent get all message request: " + getAllMessageRequest);
     }
+
+
 
     public void sendNewMessage(String uid, String fid, String content) throws JSONException {
         JSONObject sendNewMessageRequest = new JSONObject();
@@ -359,11 +366,11 @@ public class FrontendAPIProvider extends WebSocketClient {
         System.out.println("[→][Client] Sent get latest message request: " + getLatestMessageRequest);
     }
 
-    public void getConversationID(String uid, String fid) throws JSONException {
+    public void getConversationIDByEmail(String uid, String email) throws JSONException {
         JSONObject getConversationIDRequest = new JSONObject();
-        getConversationIDRequest.put("action", "getConversationID");
+        getConversationIDRequest.put("action", "getConversationIDByEmail");
         getConversationIDRequest.put("uid", uid);
-        getConversationIDRequest.put("fid", fid);
+        getConversationIDRequest.put("email", email);
 
         send(getConversationIDRequest.toString());  // 发送 JSON 请求
         System.out.println("[→][Client] Sent get conversation ID request: " + getConversationIDRequest);
@@ -459,9 +466,18 @@ public class FrontendAPIProvider extends WebSocketClient {
         System.out.println("[→][Client] Sent is user online request: " + isUserOnlineRequest);
     }
 
-    public void isFriend(String uid, String fid) throws JSONException {
+    public void isFriendByEmail(String uid, String email) throws JSONException {
         JSONObject isFriendRequest = new JSONObject();
-        isFriendRequest.put("action", "isFriend");
+        isFriendRequest.put("action", "isFriendByEmail");
+        isFriendRequest.put("uid", uid);
+        isFriendRequest.put("email", email);
+
+        send(isFriendRequest.toString());  // 发送 JSON 请求
+        System.out.println("[→][Client] Sent is friend request: " + isFriendRequest);
+    }
+    public void isFriendByUID(String uid, String fid) throws JSONException {
+        JSONObject isFriendRequest = new JSONObject();
+        isFriendRequest.put("action", "isFriendByUID");
         isFriendRequest.put("uid", uid);
         isFriendRequest.put("fid", fid);
 
