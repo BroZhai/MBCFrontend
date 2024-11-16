@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
             String password = sp.getString("password", "null");
             String uid = sp.getString("uid", "null");
             boolean loginStatus = sp.getBoolean("loginStatus", false); // 好像有点多此一举，但是先留着
-            Log.d("MainPageSP", "尝试从SharedPreferences中获取的 用户名:" + username +", 密码:" + password + ",  用户Uid:"+ uid+", 登录状态为:" + loginStatus);
+            Log.d("MainPageSP", "尝试从SharedPreferences中获取的 用户名:" + username + "用户邮箱:"+ email+", 密码:" + password + ",  用户Uid:"+ uid+", 登录状态为:" + loginStatus);
             currentUser = new User(email, password, uid);
             Toast.makeText(MainActivity.this, "Welcome back, " + username, Toast.LENGTH_SHORT).show();
         }

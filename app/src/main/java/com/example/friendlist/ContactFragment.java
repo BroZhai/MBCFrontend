@@ -123,13 +123,13 @@ public class ContactFragment extends Fragment {
                     // 卧槽，很新的参数用法，这个"_"是用来占位的，表示"我不需要这个参数"
 
                     // 在此之后，我们就可以直接用 最外面的'position'来进行item定位了
-                    public void onClick(DialogInterface dialogInterface, int _) {
+                    public void onClick(DialogInterface dialogInterface, int i) {
                         Toast.makeText(ContactFragment.this.getActivity(), "You've canceled the deletion", Toast.LENGTH_SHORT).show();
                     }
                 });
                 bdr.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int _) {
+                    public void onClick(DialogInterface dialogInterface, int i) {
                         // 删除好友item 并 更新视图
                         Toast.makeText(ContactFragment.this.getActivity(), "You've deleted " + friendList.get(position).getName(), Toast.LENGTH_SHORT).show();
                         friendList.remove(position);

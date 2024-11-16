@@ -13,7 +13,7 @@
         >
 
             <TextView
-                android:id="@+id/friendCap"
+                android:id="@+id/msgCap"
                 android:textAlignment="center"
                 android:layout_marginStart="10dp"
                 android:layout_width="60dp"
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:layout_marginLeft="34sp"
-            android:layout_toRightOf="@id/friendCap"
+            android:layout_toRightOf="@id/msgCap"
             android:layout_marginTop="15sp"
             android:text="message content"/>
 
