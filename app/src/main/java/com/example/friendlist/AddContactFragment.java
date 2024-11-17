@@ -22,10 +22,12 @@ import com.example.FrontendApi.FrontendAPIProvider;
 
 import org.json.JSONException;
 
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-
+import java.util.Observable;
+import java.util.Observer;
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link AddContactFragment#newInstance} factory method to
@@ -34,10 +36,14 @@ import java.util.ArrayList;
 public class AddContactFragment extends Fragment {
 
     FrontendAPIProvider websocket;
-    ArrayList<UserRequest> requestArray = new ArrayList<>();
+//    ArrayList<UserRequest> requestArray = new ArrayList<>(); // 原来的'好友请求列表'
+
+    RequestList requestList = new RequestList();
+    RequestObserver requestObserver = new RequestObserver();;
 
     ListView lv;
     TextView showNothing;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -94,6 +100,9 @@ public class AddContactFragment extends Fragment {
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_add_contact, container, false);
+
+        requestList.addObserver(requestObserver);
+
         EditText input_email = view.findViewById(R.id.emailReq);
         lv = view.findViewById(R.id.requestList);
         showNothing = view.findViewById(R.id.noRequestDisplay);
@@ -104,11 +113,11 @@ public class AddContactFragment extends Fragment {
         // 手动添加一个默认的'好友申请'item
         UserRequest request1 = new UserRequest("Alice", "Alice@email.com",currentUid ,"184bc12a-2b5e-41a4-8342-d997ca0e7666");
         UserRequest request2 = new UserRequest("Bob", "bob@bombmail.com",currentUid ,"184bc12a-2b5e-41a4-8342-d997ca0e7666");
-        requestArray.add(request1);
-        requestArray.add(request2);
+        requestList.getRequestList().add(request1);
+        requestList.getRequestList().add(request2);
 
 
-        if(requestArray.isEmpty()){
+        if(requestList.getRequestList().isEmpty()){
             // 如果没有请求，就不显示ListView，只显示一个TextView
             lv.setVisibility(View.GONE);
             showNothing.setVisibility(View.VISIBLE);
@@ -169,13 +178,13 @@ public class AddContactFragment extends Fragment {
         }
     }
 
-
+    // 原来的'清楚请求'方法 (更新了Observer后，这个方法应该就不需要了)
     public void clearPendingRequests(){
-        for(int i=0; i<requestArray.size(); i++){
-            if(requestArray.get(i).isPending()==false){
-                Log.d("ClearPendingRequests", "已清除:"+ requestArray.get(i).getName() +"的好友请求");
-                requestArray.remove(i);
-                if(requestArray.isEmpty()){
+        for(int i=0; i<requestList.getRequestList().size(); i++){
+            if(requestList.getRequestList().get(i).isPending()==false){
+                Log.d("ClearPendingRequests", "已清除:"+ requestList.getRequestList().get(i).getName() +"的好友请求");
+                requestList.getRequestList().remove(i);
+                if(requestList.getRequestList().isEmpty()){
                     lv.setVisibility(View.GONE);
                     showNothing.setVisibility(View.VISIBLE);
                 }else {
@@ -189,17 +198,58 @@ public class AddContactFragment extends Fragment {
         }
     }
 
+    // '被监听的'好友列表 (被Observer监视的对象)
+    class RequestList extends Observable {
+        private ArrayList<UserRequest> list = new ArrayList<>();
+
+        public ArrayList<UserRequest> getRequestList() {
+            return list;
+        }
+
+        public void addRequest(UserRequest request){
+            list.add(request);
+            setChanged();
+            notifyObservers();
+        }
+
+        public void removeAll(){
+            list.clear();
+            setChanged();
+            notifyObservers();
+        }
+
+        public int getSize(){
+            return list.size();
+        }
+
+    }
+
+    // 设置好友列表的'监听器'
+    public class RequestObserver implements Observer {
+        @Override
+        public void update(Observable o, Object arg) {
+            if (o instanceof AddContactFragment.RequestList) {
+                Log.d("RequestObserver", "检测到好友请求列表中有新请求，已更新");
+                AddContactFragment.RequestList requestList = (AddContactFragment.RequestList) o;
+                // 这里可以根据需求对新的请求进行处理，比如更新UI等
+                // 假设这里是更新ListView相关逻辑
+                ArrayList<UserRequest> requests = requestList.getRequestList();
+                // 根据requests的内容更新ListView，这里需要结合ListView的Adapter来实现具体更新逻辑
+            }
+        }
+    }
+
     /* 以下部分为Adapter, 准备给ListView使用*/
     class MyAdapter extends BaseAdapter {
         //对于每个Adapter，我们都要去重写以下四个方法 (必须重写！)
         @Override
         public int getCount() { // 获取数据的'个数'
-            return requestArray.size();
+            return requestList.getRequestList().size();
         }
 
         @Override
         public Object getItem(int i) { //获取具体某个'元素'，上面会传入'下标'进来给你定位
-            return requestArray.get(i);
+            return requestList.getRequestList().get(i);
         }
 
         @Override
@@ -226,7 +276,7 @@ public class AddContactFragment extends Fragment {
             Button acceptBtn = (Button) item_view.findViewById(R.id.acceptBtn);
             Button declineBtn = (Button) item_view.findViewById(R.id.declineBtn);
 
-            String requesterName = requestArray.get(i).getName();
+            String requesterName = requestList.getRequestList().get(i).getName();
 
             //3. 根据"原数据"设置各个控件的'展示数据'
             capital.setText(requesterName.substring(0,1));
@@ -240,8 +290,9 @@ public class AddContactFragment extends Fragment {
 //                    requestArray.get(i).acceptRequest();
                     Toast.makeText(getContext(), "Accepted request from: " + requesterName  , Toast.LENGTH_SHORT).show();
                     Log.d("AcceptButton", "已接受好友请求:" + requesterName);
-                    requestArray.get(i).acceptRequest(); // 更新'请求数组'里面的ispending状态，清楚该请求栏
-                    clearPendingRequests();
+                    requestList.getRequestList().get(i).acceptRequest(); // 更新'请求数组'里面的ispending状态，清楚该请求栏
+
+//                   clearPendingRequests(); // 原来的视图更新方法
 
                     // 尚未将操作提交至服务器
 
@@ -255,8 +306,10 @@ public class AddContactFragment extends Fragment {
 //                    requestArray.get(i).acceptRequest();
                     Toast.makeText(getContext(), "Declined request from: " + requesterName  , Toast.LENGTH_SHORT).show();
                     Log.d("DeclinedButton", "已拒绝好友请求:" + requesterName);
-                    requestArray.get(i).rejectRequest(); // 同上
-                    clearPendingRequests();
+                    requestList.getRequestList().get(i).rejectRequest(); // 同上
+//                    clearPendingRequests(); // 原来的视图更新方法
+
+                    // 尚未将操作提交至服务器
                 }
             });
 
