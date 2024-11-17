@@ -24,6 +24,9 @@ import android.widget.Toast;
 
 import com.example.FrontendApi.FrontendAPIProvider;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -42,10 +45,12 @@ public class ContactFragment extends Fragment {
 //    ArrayList<User> friendList = new ArrayList<>();
 
     ListView listView;
-    UserList userList;
+    public static UserList userList;
     UserObserver userObserver;
     TextView friendTip;
     FrontendAPIProvider websocket;
+
+    JSONArray friendList;
 
 
 
@@ -98,16 +103,6 @@ public class ContactFragment extends Fragment {
         userObserver = new UserObserver();
         userList.addObserver(userObserver);
 
-        // 初始化WebSocket连接，等待响应
-        initWebSocket();
-        try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-
-
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_contact, container, false);
         listView = view.findViewById(R.id.contactListView);
@@ -117,11 +112,37 @@ public class ContactFragment extends Fragment {
 
         // 读取SharedPreferences中的'本地用户数据' (目前只要了uid, 其他要的后面再加)
         SharedPreferences sp = getActivity().getSharedPreferences("userdata", MODE_PRIVATE);
-        String selfID = sp.getString("uid", "null");
+        String myUid = sp.getString("uid", "null");
+
+        // 初始化WebSocket连接，等待响应
+        initWebSocket();
+        try {
+            sleep(600);
+            websocket.getUserFriendList(myUid); // 向服务器请求: '当前用户'的好友列表
+            sleep(1000);
+            friendList = websocket.friend_list;
+        } catch (InterruptedException | JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+        if(friendList != null){// 如果好友列表不为空
+            System.out.println("当前用户好友列表不为空，正在读取好友列表...");
+            System.out.println(friendList);
+            for(int i = 0; i < friendList.length(); i++){
+                try {
+                    String fname = friendList.getJSONObject(i).getString("uname");
+//                    String femail = friendList.getJSONObject(i).getString("email");  // 邮箱尚未能取得，等UG
+                    String fuid = friendList.getJSONObject(i).getString("uid");
+//                    User u = new User(fname, "null", fuid);
+//                    userList.addUser(u);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
 
-
-        fillArray();
+//        fillArray(); 原本的测试数据填充方法，现在改为从服务器获取好友列表
 
         if(userList.getSize() > 0){
             // 列表有好友
@@ -141,7 +162,7 @@ public class ContactFragment extends Fragment {
                 Intent intent = new Intent(ContactFragment.this.getActivity(), ChatPage.class);
                 intent.putExtra("friendName", userList.getUserList().get(i).getName());
                 intent.putExtra("friendID", userList.getUserList().get(i).getUid());
-                intent.putExtra("selfID", selfID);
+                intent.putExtra("selfID", myUid);
                 startActivity(intent);
             }
         });
@@ -255,8 +276,8 @@ public class ContactFragment extends Fragment {
     }
 
     // 监听的'好友对象'列表
-    class UserList extends Observable{
-        private ArrayList<User> userList = new ArrayList<>();
+    public static class UserList extends Observable{
+        public static ArrayList<User> userList = new ArrayList<>();
         public void addUser(User user){
             userList.add(user);
             setChanged();

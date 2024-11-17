@@ -36,6 +36,7 @@ public class AddContactFragment extends Fragment {
     private ListView lv;
     private TextView showNothing;
     private JSONArray requestJson;
+    private String currentUid; // 当前用户的uid
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -99,7 +100,7 @@ public class AddContactFragment extends Fragment {
         showNothing = view.findViewById(R.id.noRequestDisplay);
         Button sendBtn = view.findViewById(R.id.sendReq);
         SharedPreferences sp = getContext().getSharedPreferences("userdata", getContext().MODE_PRIVATE);
-        String currentUid = sp.getString("uid", "null");
+        currentUid = sp.getString("uid", "null");
 
         // 手动添加一个默认的'好友申请'item
 
@@ -314,23 +315,36 @@ public class AddContactFragment extends Fragment {
                     // Accept the request
                     Toast.makeText(getContext(), "Accepted request from: " + requesterName, Toast.LENGTH_SHORT).show();
                     Log.d("AcceptButton", "已接受好友请求:" + requesterName);
-                    requestList.getRequestList().get(i).acceptRequest(); // 更新'请求数组'里面的ispending状态，清楚该请求栏
+
+                    String fid = requestList.getRequestList().get(i).getFUid();
+                    try {
+                        websocket.isFriendRequestAccept(currentUid, fid,"accepted");
+                        sleep(100);
+                    } catch (JSONException | InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    requestList.getRequestList().get(i).acceptRequest(); // 更新'请求数组'里面的ispending状态，清除该请求栏
                     // 更新UI显示
                     clearPendingRequests();
-
-
-                    // 尚未将操作提交至服务器
                 }
             });
 
-            declineBtn.setOnClickListener(new View.OnClickListener() { //接受好友请求
+            declineBtn.setOnClickListener(new View.OnClickListener() {
+                //拒绝好友请求
                 @Override
                 public void onClick(View view) {
                     // Accept the request
                     Toast.makeText(getContext(), "Declined request from: " + requesterName, Toast.LENGTH_SHORT).show();
                     Log.d("DeclinedButton", "已拒绝好友请求:" + requesterName);
+                    String fid = requestList.getRequestList().get(i).getFUid();
+                    try {
+                        websocket.isFriendRequestAccept(currentUid, fid,"blocked");
+                        sleep(100);
+                    } catch (JSONException | InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                     requestList.getRequestList().get(i).rejectRequest(); // 同上
-
                     // 更新UI显示
                     clearPendingRequests();
 
