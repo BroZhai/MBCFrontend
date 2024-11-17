@@ -15,6 +15,7 @@ public class FrontendAPIProvider extends WebSocketClient {
     public JSONObject latest_message;
     public JSONArray all_message;
     public JSONArray friend_list;
+    public JSONArray request_friendList;
 
     //User info
     public String action;
@@ -88,6 +89,9 @@ public class FrontendAPIProvider extends WebSocketClient {
             case "addNewFriend":
                 handleAddNewFriendResponse(response);
                 break;
+            case "getFriendRequestList":
+                handleGetFriendRequestListResponse(response);
+
             case "isFriendRequestAccept":
                 handleIsFriendRequestAcceptResponse(response);
                 break;
@@ -146,6 +150,13 @@ public class FrontendAPIProvider extends WebSocketClient {
         }
     }
 
+    private void handleGetFriendRequestListResponse(JSONObject response) {
+        success = response.optBoolean("success", false);
+        action = response.optString("action");
+        request_friendList = response.optJSONArray("request_friendList");
+
+        System.out.println("[←][Server & Client] Get friend request list result: " + success);
+    }
 
 
     private void handleIsFriendByEmailResponse(JSONObject response) {
@@ -457,6 +468,15 @@ public class FrontendAPIProvider extends WebSocketClient {
         System.out.println("[→][Client] Sent get user friend list request: " + getUserFriendListRequest);
     }
 
+    public void getFriendRequestList(String uid) throws JSONException {
+        JSONObject getFriendRequestListRequest = new JSONObject();
+        getFriendRequestListRequest.put("action", "getFriendRequestList");
+        getFriendRequestListRequest.put("uid", uid);
+
+        send(getFriendRequestListRequest.toString());  // 发送 JSON 请求
+        System.out.println("[→][Client] Sent get friend request list request: " + getFriendRequestListRequest);
+    }
+
     public void isUserOnline(String uid) throws JSONException {
         JSONObject isUserOnlineRequest = new JSONObject();
         isUserOnlineRequest.put("action", "isUserOnline");
@@ -502,7 +522,7 @@ public class FrontendAPIProvider extends WebSocketClient {
             URI serverURI = new URI("ws://localhost:8080/backend-api");
             FrontendAPIProvider client = new FrontendAPIProvider(serverURI);//onOpen会被执行
             client.connectBlocking();  // 阻塞，直到连接建立
-
+            client.getFriendRequestList("7b2442e6-ae95-45f4-a2bf-c5a5b8051d6c");
             // 示例：发送注册请求
             client.sendRegisterRequest("rokidna2", "rokidna2@gnetwork.com", "rokiroki");
             Thread.sleep(1000);
@@ -514,3 +534,4 @@ public class FrontendAPIProvider extends WebSocketClient {
         }
     }
 }
+
