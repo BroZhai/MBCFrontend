@@ -2,6 +2,8 @@ package com.example.friendlist;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import static java.lang.Thread.sleep;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,6 +22,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.FrontendApi.FrontendAPIProvider;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,6 +45,8 @@ public class ContactFragment extends Fragment {
     UserList userList;
     UserObserver userObserver;
     TextView friendTip;
+    FrontendAPIProvider websocket;
+
 
 
 
@@ -89,6 +97,14 @@ public class ContactFragment extends Fragment {
         userList = new UserList();
         userObserver = new UserObserver();
         userList.addObserver(userObserver);
+
+        // 初始化WebSocket连接，等待响应
+        initWebSocket();
+        try {
+            sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
 
 
@@ -183,6 +199,17 @@ public class ContactFragment extends Fragment {
         userList.addUser(u2);
         userList.addUser(u3);
         userList.addUser(u4);
+    }
+
+    // 初始化WebSocket连接
+    public void initWebSocket() {
+        try {
+            URI uri = new URI("ws://10.0.2.2:8080/backend-api");
+            websocket = new FrontendAPIProvider(uri);
+            websocket.connect();  // 异步连接
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     class MyAdapter extends BaseAdapter {

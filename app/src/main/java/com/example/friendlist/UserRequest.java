@@ -1,6 +1,6 @@
 package com.example.friendlist;
 
-public class UserRequest extends User{
+public class UserRequest{
 
     /*    原父类User的属性
     private String name;
@@ -9,16 +9,19 @@ public class UserRequest extends User{
     public boolean isFriend;
     */
 
-    // tips: uid是自己, fid是对方
-    private String fid;
+    private String Femail;
+    private String Fuid;
+    private String Fname;
+    public boolean isFriend;
 
     private boolean pending=true;
 
-    // 原User的构造函数
-    public UserRequest(String name, String email, String uid, String fid) {
-        super(name, email, uid, fid);
-        this.fid = fid;
+    public UserRequest(String fname, String femail, String fuid){
+        this.Fname = fname;
+        this.Femail = femail;
+        this.Fuid = fuid;
     }
+
 
     public void acceptRequest(){
         this.pending = false;
@@ -32,6 +35,18 @@ public class UserRequest extends User{
 
     public boolean isPending(){
         return this.pending;
+    }
+
+    public String getFName() {
+        return this.Fname;
+    }
+
+    public String getFEmail() {
+        return this.Femail;
+    }
+
+    public String getFUid() {
+        return this.Fuid;
     }
 
 }

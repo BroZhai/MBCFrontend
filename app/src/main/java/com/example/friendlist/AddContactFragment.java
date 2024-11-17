@@ -1,5 +1,7 @@
 package com.example.friendlist;
 
+import static java.lang.Thread.sleep;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +19,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.FrontendApi.FrontendAPIProvider;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.net.URI;
@@ -32,6 +35,7 @@ public class AddContactFragment extends Fragment {
     private RequestObserver requestObserver;
     private ListView lv;
     private TextView showNothing;
+    private JSONArray requestJson;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -73,6 +77,7 @@ public class AddContactFragment extends Fragment {
         }
     }
 
+    // 初始化WebSocket
     public void initWebSocket() {
         try {
             URI uri = new URI("ws://10.0.2.2:8080/backend-api");
@@ -118,6 +123,33 @@ public class AddContactFragment extends Fragment {
 
         initWebSocket(); // 创建该界面时，初始化WebSocket并尝试建立连接
 
+        try {
+            sleep(700); // 等待WebSocket连接建立
+            websocket.getFriendRequestList(currentUid);
+            sleep(1000);
+        } catch (InterruptedException | JSONException e) {
+            throw new RuntimeException(e);
+            }
+//        System.out.println(websocket.request_friendList); // 测试'打印数据'
+        requestJson = websocket.request_friendList;
+        if (requestJson != null) {
+            System.out.println("返回的Json好友请求列表不为空！正在读取数据...");
+            for (int i = 0; i < requestJson.length(); i++) {
+                try {
+                    String friendName = requestJson.getJSONObject(i).getString("uname");
+                    String email = requestJson.getJSONObject(i).getString("email");
+                    String fid = requestJson.getJSONObject(i).getString("uid");
+                    System.out.println("好友请求列表中的第" + i + "个请求: " + "用户名: " + friendName + " 邮箱: " + email  + " 好友fid: " + fid);
+                    UserRequest request = new UserRequest(friendName, email, fid);
+                    requestList.addRequest(request);
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        } else {
+            System.out.println("阿偶，返回的Json好友请求列表为空!?");
+        }
+
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -155,6 +187,8 @@ public class AddContactFragment extends Fragment {
         return view;
     }
 
+
+
     @Override
     // 当Fragment被显示时，注册监听器
     public void onResume() {
@@ -179,6 +213,9 @@ public class AddContactFragment extends Fragment {
             websocket.close();
         }
     }
+
+
+
 
     // '被监听的'好友列表 (被Observer监视的对象)
     class RequestList extends Observable {
@@ -226,6 +263,7 @@ public class AddContactFragment extends Fragment {
         }
     }
 
+
     /* 以下部分为Adapter, 准备给ListView使用*/
     class MyAdapter extends BaseAdapter {
         //对于每个Adapter，我们都要去重写以下四个方法 (必须重写！)
@@ -263,7 +301,7 @@ public class AddContactFragment extends Fragment {
             Button acceptBtn = (Button) item_view.findViewById(R.id.acceptBtn);
             Button declineBtn = (Button) item_view.findViewById(R.id.declineBtn);
 
-            String requesterName = requestList.getRequestList().get(i).getName();
+            String requesterName = requestList.getRequestList().get(i).getFName();
 
             //3. 根据"原数据"设置各个控件的'展示数据'
             capital.setText(requesterName.substring(0, 1));
@@ -307,7 +345,7 @@ public class AddContactFragment extends Fragment {
     public void clearPendingRequests(){
         for(int i=0; i<requestList.getRequestList().size(); i++){
             if(requestList.getRequestList().get(i).isPending()==false){
-                Log.d("ClearPendingRequests", "已清除:"+ requestList.getRequestList().get(i).getName() +"的好友请求");
+                Log.d("ClearPendingRequests", "已清除:"+ requestList.getRequestList().get(i).getFName() +"的好友请求");
                 requestList.getRequestList().remove(i);
                 if(requestList.getRequestList().isEmpty()){
                     lv.setVisibility(View.GONE);
