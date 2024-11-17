@@ -10,6 +10,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -30,12 +33,13 @@ import java.util.List;
  */
 public class ContactFragment extends Fragment {
 
-    ArrayList<User> friendList = new ArrayList<>();
-    private String[] friendName = {
-            "Pancake Tekon", "Vvokos", "China Boy","Leafeon BaiLong",
-            "Pinkcandy Zhou", "DanielL 04", "Rokidna UG",
-            "Ice Wings","Joy Project", "White sheep",
-            "Dreamland Palesky","Sliver Cat", "多摩 aac1"};
+//    ArrayList<User> friendList = new ArrayList<>();
+
+    ListView listView;
+    UserList userList;
+    UserObserver userObserver;
+    TextView friendTip;
+
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -81,26 +85,46 @@ public class ContactFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // 注册'好友监听器'
+        userList = new UserList();
+        userObserver = new UserObserver();
+        userList.addObserver(userObserver);
+
+
+
         // Inflate the layout for this fragment
-
-        fillArray(); // 暂时的方法，将所有的静态list存到Arraylist中，好实现一会儿的"删除"+视图更新
-
         View view = inflater.inflate(R.layout.fragment_contact, container, false);
-        ListView listView = view.findViewById(R.id.contactListView);
+        listView = view.findViewById(R.id.contactListView);
         listView.setAdapter(new MyAdapter());
+
+        friendTip = view.findViewById(R.id.noFriendTip);
 
         // 读取SharedPreferences中的'本地用户数据' (目前只要了uid, 其他要的后面再加)
         SharedPreferences sp = getActivity().getSharedPreferences("userdata", MODE_PRIVATE);
         String selfID = sp.getString("uid", "null");
 
+
+
+        fillArray();
+
+        if(userList.getSize() > 0){
+            // 列表有好友
+            listView.setVisibility(View.VISIBLE);
+            friendTip.setVisibility(View.GONE);
+        }else {
+            // 列表无好友
+            listView.setVisibility(View.GONE);
+            friendTip.setVisibility(View.VISIBLE);
+        }
+
         // 设置短按item的监听器
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(ContactFragment.this.getActivity(), "You've clicked " + friendList.get(i).getName(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(ContactFragment.this.getActivity(), "You've clicked " + userList.getUserList().get(i).getName(), Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(ContactFragment.this.getActivity(), ChatPage.class);
-                intent.putExtra("friendName", friendList.get(i).getName());
-                intent.putExtra("friendID", friendList.get(i).getUid());
+                intent.putExtra("friendName", userList.getUserList().get(i).getName());
+                intent.putExtra("friendID", userList.getUserList().get(i).getUid());
                 intent.putExtra("selfID", selfID);
                 startActivity(intent);
             }
@@ -117,7 +141,7 @@ public class ContactFragment extends Fragment {
                 bdr.setCancelable(true); // 设置是否可以通过"点击对话框外部"取消对话框
 
                 bdr.setTitle("Delete Friend"); // 设置对话框标题
-                bdr.setMessage("Are you sure to delete " + friendList.get(position).getName() + "?"); // 设置对话框内容
+                bdr.setMessage("Are you sure to delete " + userList.getUserList().get(position).getName() + "?"); // 设置对话框内容
                 bdr.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     // 卧槽，很新的参数用法，这个"_"是用来占位的，表示"我不需要这个参数"
@@ -131,8 +155,8 @@ public class ContactFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         // 删除好友item 并 更新视图
-                        Toast.makeText(ContactFragment.this.getActivity(), "You've deleted " + friendList.get(position).getName(), Toast.LENGTH_SHORT).show();
-                        friendList.remove(position);
+                        Toast.makeText(ContactFragment.this.getActivity(), "You've deleted " + userList.getUserList().get(position).getName(), Toast.LENGTH_SHORT).show();
+                        userList.getUserList().remove(position);
                         listView.setAdapter(new MyAdapter());
                     }
                 });
@@ -148,27 +172,29 @@ public class ContactFragment extends Fragment {
         return view;
     }
 
-    // 用于填充Arraylist的方法（暂用，里面填的是User对象）
+    // 填充'好友列表'测试数据（暂用，里面填的是User对象）
     public void fillArray(){
         // User(name,email,uid);
         User u1 = new User("Rokidna UG","u1mail","aaf57298-8de9-4bd1-8ffe-4830f0926e4d");
         User u2 = new User("PinkCandy Zhou","u2mail","8faa8b99-0e47-4f9e-a5cd-23273cd9ce46");
         User u3 = new User("China Boy","u3mail","e43fd95d-2a61-4c14-9299-32633cd17ab4");
         User u4 = new User("Vvokos","u4mail","3964a988-8b32-42f3-9d11-14b75eb1b925");
-        List<User> temp = Arrays.asList(u1,u2,u3,u4);
-        friendList.addAll(temp);
+        userList.addUser(u1);
+        userList.addUser(u2);
+        userList.addUser(u3);
+        userList.addUser(u4);
     }
 
     class MyAdapter extends BaseAdapter {
         //对于每个Adapter，我们都要去重写以下四个方法 (必须重写！)
         @Override
         public int getCount() { // 获取数据的'个数'
-            return friendList.size();
+            return userList.getSize();
         }
 
         @Override
         public Object getItem(int i) { //获取具体某个'元素'，上面会传入'下标'进来给你定位
-            return friendList.get(i);
+            return userList.getUserList().get(i);
         }
 
         @Override
@@ -192,7 +218,7 @@ public class ContactFragment extends Fragment {
             //Tips: priceLable不用动(设置)，它就是放在那里展示的
 
             //3. 根据"原数据"设置各个控件的'展示数据'
-            String fName = friendList.get(i).getName();
+            String fName = userList.getUserList().get(i).getName();
             capital.setText(fName.substring(0,1));
             nameString.setText(fName);
 
@@ -200,5 +226,48 @@ public class ContactFragment extends Fragment {
             return item_view;
         }
     }
+
+    // 监听的'好友对象'列表
+    class UserList extends Observable{
+        private ArrayList<User> userList = new ArrayList<>();
+        public void addUser(User user){
+            userList.add(user);
+            setChanged();
+            notifyObservers();
+        }
+        public void removeUser(User user){
+            userList.remove(user);
+            setChanged();
+            notifyObservers();
+        }
+        public ArrayList<User> getUserList(){
+            return userList;
+        }
+
+        public int getSize(){
+            return userList.size();
+        }
+    }
+
+    // 监听'好友对象'的Observer
+    class UserObserver implements Observer {
+        @Override
+        public void update(Observable o, Object arg) {
+            if (o instanceof UserList) {
+                Log.d("FriendListObserver", "好友列表发生变动，已更新");
+//                ContactFragment.UserList ul = (ContactFragment.UserList) o;
+//                ArrayList<User> list = ul.getUserList();
+//                if(list.isEmpty()){
+//                    listView.setVisibility(View.GONE);
+//                    friendTip.setVisibility(View.VISIBLE);
+//                }else {
+//                    listView.setVisibility(View.VISIBLE);
+//                    friendTip.setVisibility(View.GONE);
+//                }
+                ((MyAdapter)listView.getAdapter()).notifyDataSetChanged();
+            }
+        }
+    }
+
 }
 
