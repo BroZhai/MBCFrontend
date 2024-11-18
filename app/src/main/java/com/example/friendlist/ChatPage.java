@@ -74,7 +74,7 @@ public class ChatPage extends AppCompatActivity {
         msgListView = findViewById(R.id.chattingList);
         msgListView.setAdapter(new MyAdapter());
 
-        timer.schedule(timerTask, 1000, 2000); // 每隔2秒同步一次消息
+        timer.schedule(timerTask, 1000, 300); // 每隔2秒同步一次消息
     }
 
     // 发送按钮
