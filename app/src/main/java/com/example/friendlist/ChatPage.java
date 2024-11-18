@@ -121,13 +121,12 @@ public class ChatPage extends AppCompatActivity {
         websocket.getLatestMessage(myUid, friendUid);
         sleep(200);
         JSONObject newMsg = websocket.latest_message;
-        System.out.println("newMsg: " + newMsg.toString());
         if(newMsg==null){
             Log.d("ChatPage", "目前还没有新消息");
         }else {
             String judge = newMsg.getString("sid");
             String content = newMsg.getString("content");
-            if(judge.equals(myUid)){
+            if(!judge.equals(myUid)){
                 Log.d("ChatPage", "我有新消息: " + newMsg.toString());
                 String newTime = newMsg.getString("timestamp");
                 Message newMessage = new Message(judge, friendUid, content);
