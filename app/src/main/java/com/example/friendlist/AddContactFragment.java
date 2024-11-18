@@ -169,19 +169,18 @@ public class AddContactFragment extends Fragment {
                         // 原代码中的sleep(600)不是一个好的处理异步操作的方式，todo: 找到更好的解决方式
                         sleep(600);
                         if (websocket.success) {
-                            Toast.makeText(getContext(), "好友请求已成功发至: " + emailStr, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Friend request has successfully send to: " + emailStr, Toast.LENGTH_SHORT).show();
                             Log.d("WebSocketRegisiter", "服务器已成功响应好友请求" + emailStr);
                             input_email.setText("");
+                            return;
                         } else {
-                            Toast.makeText(getContext(), "服务器响应了失败QAQ..." + emailStr, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "User email does not exist, try again :(" + emailStr, Toast.LENGTH_SHORT).show();
                             Log.d("WebSocketRegisiter", "加好友失败QAQ...");
+                            return;
                         }
                     } catch (JSONException | InterruptedException e) {
                         throw new RuntimeException(e);
                     }
-                    // Display a toast message to the user
-                    Toast.makeText(getContext(), "Request sent to: " + emailStr, Toast.LENGTH_SHORT).show();
-                    input_email.setText("");
                 }
             }
         });
@@ -285,10 +284,7 @@ public class AddContactFragment extends Fragment {
             //viewGroup (listView对象本身，用的少)
 
             //1. 使用View.inflate()加载布局 inflate(Activity对象，布局文件，不知道就填null);
-            //todo: 这里的还没有写出每个'请求item'的layout样式
             View item_view = view.inflate(AddContactFragment.this.getActivity(), R.layout.request_item_list, null);
-
-            // todo: 以下部分要把'请求item'的layout样式写出来之后，才能确认(要修改哪些地方，以及对应'操作按钮'的监听)
 
             //2. 从取得的View对象中，获取里面 要进行'动态设置'的'小组件' (注意要指定为上面的inflate()的view对象来找[不然默认就会去找'全局的View']XD)
             TextView capital = (TextView) item_view.findViewById(R.id.capLetter);
@@ -303,7 +299,8 @@ public class AddContactFragment extends Fragment {
             nameString.setText(requesterName);
 
             //3.5 在这里设置'各个item按钮'的监听器
-            acceptBtn.setOnClickListener(new View.OnClickListener() { //接受好友请求
+            acceptBtn.setOnClickListener(new View.OnClickListener() {
+                //接受好友请求
                 @Override
                 public void onClick(View view) {
                     // Accept the request
@@ -341,8 +338,6 @@ public class AddContactFragment extends Fragment {
                     requestList.getRequestList().get(i).rejectRequest(); // 同上
                     // 更新UI显示
                     clearPendingRequests();
-
-                    // 尚未将操作提交至服务器
                 }
             });
 

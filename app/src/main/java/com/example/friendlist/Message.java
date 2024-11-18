@@ -5,7 +5,7 @@ public class Message {
     private String receiverUID;
     private String content;
     private boolean isFriendMsg = false;
-    private String time; // 暂留，可能会用到 (吗?
+    private String time; // 用于区分'不同的消息'
 
     public Message(String senderUID, String receiverUID, String content) {
         this.senderUID = senderUID;

@@ -129,6 +129,8 @@ public class ContactFragment extends Fragment {
             System.out.println("当前用户好友列表不为空，正在读取好友列表...");
             userList.getUserList().clear(); // 清空之前的'已缓存'好友列表
             System.out.println(friendList);
+
+            // 从服务器读取到的'好友列表'加载'好友数据'
             for(int i = 0; i < friendList.length(); i++){
                 try {
                     String fname = friendList.getJSONObject(i).getString("uname");
@@ -141,9 +143,6 @@ public class ContactFragment extends Fragment {
                 }
             }
         }
-
-
-//        fillArray(); 原本的测试数据填充方法，现在改为从服务器获取好友列表
 
         if(userList.getSize() > 0){
             // 列表有好友
@@ -159,7 +158,7 @@ public class ContactFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(ContactFragment.this.getActivity(), "You've clicked " + userList.getUserList().get(i).getName(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(ContactFragment.this.getActivity(), "You are not chatting with " + userList.getUserList().get(i).getName(), Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(ContactFragment.this.getActivity(), ChatPage.class);
                 intent.putExtra("friendName", userList.getUserList().get(i).getName());
                 intent.putExtra("friendUid", userList.getUserList().get(i).getUid());
@@ -182,8 +181,6 @@ public class ContactFragment extends Fragment {
                 bdr.setMessage("Are you sure to delete " + userList.getUserList().get(position).getName() + "?"); // 设置对话框内容
                 bdr.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
-                    // 卧槽，很新的参数用法，这个"_"是用来占位的，表示"我不需要这个参数"
-
                     // 在此之后，我们就可以直接用 最外面的'position'来进行item定位了
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Toast.makeText(ContactFragment.this.getActivity(), "You've canceled the deletion", Toast.LENGTH_SHORT).show();
@@ -224,19 +221,6 @@ public class ContactFragment extends Fragment {
 
 
         return view;
-    }
-
-    // 填充'好友列表'测试数据（暂用，里面填的是User对象）
-    public void fillArray(){
-        // User(name,email,uid);
-        User u1 = new User("Rokidna UG","u1mail","aaf57298-8de9-4bd1-8ffe-4830f0926e4d");
-        User u2 = new User("PinkCandy Zhou","u2mail","8faa8b99-0e47-4f9e-a5cd-23273cd9ce46");
-        User u3 = new User("China Boy","u3mail","e43fd95d-2a61-4c14-9299-32633cd17ab4");
-        User u4 = new User("Vvokos","u4mail","3964a988-8b32-42f3-9d11-14b75eb1b925");
-        userList.addUser(u1);
-        userList.addUser(u2);
-        userList.addUser(u3);
-        userList.addUser(u4);
     }
 
     // 初始化WebSocket连接

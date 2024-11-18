@@ -120,8 +120,6 @@ public class LoginPage extends AppCompatActivity {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-
-
     }
 
     public void goRegister(View view) {

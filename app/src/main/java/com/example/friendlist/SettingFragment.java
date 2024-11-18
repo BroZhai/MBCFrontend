@@ -176,7 +176,7 @@ public class SettingFragment extends Fragment {
         logoutBtn.setOnClickListener(new View.OnClickListener() {
              @Override
              public void onClick(View v) {
-                 Toast.makeText(getActivity(),userEmail + " 现已登出", Toast.LENGTH_SHORT).show();
+                 Toast.makeText(getActivity(),userEmail + " is now logout, disabling autologin", Toast.LENGTH_SHORT).show();
                  // 用户登出，清除SharedPreferences里面的用户登录信息
                  editor.clear(); // 清除'当前用户'的 所有数据
                  editor.putBoolean("loginStatus", false);
