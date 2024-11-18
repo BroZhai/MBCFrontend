@@ -195,17 +195,10 @@ public class AddContactFragment extends Fragment {
     // 当Fragment被显示时，注册监听器
     public void onResume() {
         super.onResume();
-
         requestList.addObserver(requestObserver);
-
         SharedPreferences sp = getContext().getSharedPreferences("userdata", getContext().MODE_PRIVATE);
         String currentUid = sp.getString("uid", "null");
 
-        // 创建的'用户请求'测试数据
-//        UserRequest request1 = new UserRequest("Alice", "Alice@email.com", currentUid, "184bc12a-2b5e-41a4-8342-d997ca0e7666");
-//        UserRequest request2 = new UserRequest("Bob", "bseob@bombmail.com", currentUid, "184bc12a-2b5e-41a4-8342-d997ca0e7666");
-//        requestList.addRequest(request1);
-//        requestList.addRequest(request2);
     }
 
     @Override
