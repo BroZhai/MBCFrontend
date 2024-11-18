@@ -1,5 +1,7 @@
 package com.example.friendlist;
 
+import static java.lang.Thread.sleep;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -14,6 +16,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.FrontendApi.FrontendAPIProvider;
+
+import org.json.JSONException;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link SettingFragment#newInstance} factory method to
@@ -23,6 +32,7 @@ public class SettingFragment extends Fragment {
 
     EditText username;
     EditText password;
+    FrontendAPIProvider websocket;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -73,11 +83,15 @@ public class SettingFragment extends Fragment {
         Button logoutBtn = view.findViewById(R.id.logoutBtn); // 登出按钮
         SharedPreferences sp = getActivity().getSharedPreferences("userdata", getActivity().MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit(); // 创建sp存储的'修改器'
-        String userEmail = sp.getString("email", "null"); // 拿取SP里面的用户数据
+        // 拿取SP里面的用户数据
+        String userEmail = sp.getString("email", "null");
+        String myUid = sp.getString("uid","null");
 
         // 获取用户输入'要改变的' email和password (输入控件)
         username = view.findViewById(R.id.changeUsernameInput);
         password = view.findViewById(R.id.changePasswordInput);
+
+        initWebSocket(); // 初始化WebSocket连接
 
         changeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,32 +108,66 @@ public class SettingFragment extends Fragment {
                 }else{
                     if(newUsername.isEmpty() && !newPassword.isEmpty()) {
                         // 用户只填了password，没填username
-                        Toast.makeText(getActivity(), "Changed password: "+newPassword, Toast.LENGTH_SHORT).show();
-                        Log.d("PasswordChange", "修改的密码为: "+newPassword);
+                        Log.d("PasswordChange", "要修改的密码为: "+newPassword);
                         //服务器操作
+                        try {
+                            websocket.changePassword(myUid, newPassword);
+                            sleep(800);
+                            if(websocket.success){
+                                Log.d("PasswordChange", "服务器端密码修改成功，正在存储到本地SP数据...");
+                                editor.putString("password", newPassword);
+                            }else {
+                                Log.e("PasswordChange", "服务器端密码修改失败...");
+                            }
+                        } catch (JSONException | InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
 
                     }else if(!newUsername.isEmpty() && newPassword.isEmpty()) {
                         // 用户只填了username
-                        Toast.makeText(getActivity(), "Changed username: "+newUsername, Toast.LENGTH_SHORT).show();
-                        Log.d("UsernameChange", "修改的用户名为: "+newUsername);
+                        Log.d("UsernameChange", "要修改的用户名为: "+newUsername);
                         //服务器操作
+                        try {
+                            websocket.changeName(myUid, newUsername);
+                            sleep(800);
+                            if(websocket.success){
+                                Log.d("UsernameChange", "服务器端用户名修改成功，正在存储到本地SP数据...");
+                                editor.putString("username", newUsername);
+                            }else {
+                                Log.e("UsernameChange", "服务器端用户名修改失败...");
+                            }
+                        } catch (JSONException | InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
 
                     }else{
                         // 用户俩都填了
-                        Toast.makeText(getActivity(), "Changed username: "+username + " and password: "+password, Toast.LENGTH_SHORT).show();
-
+                        Log.d("U+PChanged", "修改的用户名: "+newUsername + ", 修改的密码: "+newPassword);
                         // 服务器操作
-
+                        try {
+                            websocket.changeName(myUid, newUsername);
+                            sleep(700);
+                            websocket.changePassword(myUid, newPassword);
+                            sleep(700);
+                            if(websocket.success){
+                                Log.d("UsernameChange", "服务器端用户名+密码修改成功，正在存储到本地SP数据...");
+                                editor.putString("username", newUsername);
+                                editor.putString("password", newPassword);
+                            }else {
+                                Log.e("UsernameChange", "服务器端用户名+密码修改失败...");
+                            }
+                        } catch (JSONException | InterruptedException e) {
+                            throw new RuntimeException(e);
 
                         }
                     }
-
+                }
                 // 服务器操作成功后，修改本地SP数据 (否则在if-else if 跳出，并提示用户'修改失败')
-//                editor.putString("username", newUsername);
-//                editor.putString("password", newPassword);
-//                editor.apply();
-//                Log.d("SharedPreferences", "用户数据已修改");
-//                Toast.makeText(getActivity(), "用户数据已修改", Toast.LENGTH_SHORT).show();
+                editor.apply();
+                Toast.makeText(getActivity(), "Server response Success!", Toast.LENGTH_SHORT).show();
+                Log.d("SharedPreferences", "本地用户数据已修改");
+                username.setText("");
+                password.setText("");
             }
         });
 
@@ -143,6 +191,17 @@ public class SettingFragment extends Fragment {
          });
         // Inflate the layout for this fragment
         return view;
+    }
+
+    // 初始化WebSocket连接
+    public void initWebSocket() {
+        try {
+            URI uri = new URI("ws://10.0.2.2:8080/backend-api");
+            websocket = new FrontendAPIProvider(uri);
+            websocket.connect();  // 异步连接
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
 
