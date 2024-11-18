@@ -135,6 +135,7 @@ public class AddContactFragment extends Fragment {
         requestJson = websocket.request_friendList;
         if (requestJson != null) {
             System.out.println("返回的Json好友请求列表不为空！正在读取数据...");
+            System.out.println(requestJson);
             for (int i = 0; i < requestJson.length(); i++) {
                 try {
                     String friendName = requestJson.getJSONObject(i).getString("uname");
@@ -165,8 +166,8 @@ public class AddContactFragment extends Fragment {
                     try {
                         websocket.addNewFriend(currentUid, emailStr);
                         // 这里假设addNewFriend是异步操作，并且有合适的回调机制来处理结果，
-                        // 原代码中的sleep(600)不是一个好的处理异步操作的方式，这里先注释掉
-//                        sleep(600);
+                        // 原代码中的sleep(600)不是一个好的处理异步操作的方式，todo: 找到更好的解决方式
+                        sleep(600);
                         if (websocket.success) {
                             Toast.makeText(getContext(), "好友请求已成功发至: " + emailStr, Toast.LENGTH_SHORT).show();
                             Log.d("WebSocketRegisiter", "服务器已成功响应好友请求" + emailStr);
@@ -175,7 +176,7 @@ public class AddContactFragment extends Fragment {
                             Toast.makeText(getContext(), "服务器响应了失败QAQ..." + emailStr, Toast.LENGTH_SHORT).show();
                             Log.d("WebSocketRegisiter", "加好友失败QAQ...");
                         }
-                    } catch (JSONException e) {
+                    } catch (JSONException | InterruptedException e) {
                         throw new RuntimeException(e);
                     }
                     // Display a toast message to the user
@@ -202,7 +203,7 @@ public class AddContactFragment extends Fragment {
 
         // 创建的'用户请求'测试数据
 //        UserRequest request1 = new UserRequest("Alice", "Alice@email.com", currentUid, "184bc12a-2b5e-41a4-8342-d997ca0e7666");
-//        UserRequest request2 = new UserRequest("Bob", "bob@bombmail.com", currentUid, "184bc12a-2b5e-41a4-8342-d997ca0e7666");
+//        UserRequest request2 = new UserRequest("Bob", "bseob@bombmail.com", currentUid, "184bc12a-2b5e-41a4-8342-d997ca0e7666");
 //        requestList.addRequest(request1);
 //        requestList.addRequest(request2);
     }
