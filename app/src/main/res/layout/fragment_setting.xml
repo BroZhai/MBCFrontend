@@ -7,47 +7,145 @@
     tools:context=".SettingFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|center_horizontal"
-        android:background="#74E7FA"
-        android:gravity="center_horizontal"
-        android:text="Setting Page"
-        android:textSize="33dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="设置界面"
-        android:textSize="33dp" />
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <TextView
+                android:id="@+id/settingTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|center_horizontal"
+                android:background="#74E7FA"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:gravity="center"
+                android:text="Setting Page"
+                android:textSize="33dp" />
+
+            <ImageView
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:src="@drawable/baseline_settings_24"
+                app:layout_constraintTop_toBottomOf="@id/settingTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="100dp"
+                />
+
+            <FrameLayout
+                android:id="@+id/operationArea"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/settingTitle"
+                android:layout_marginTop="150dp">
+
+             <androidx.constraintlayout.widget.ConstraintLayout
+                 android:layout_width="match_parent"
+                 android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/accountSettingTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Account Settings"
+                android:textSize="28dp"
+                android:layout_marginTop="50sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+                <LinearLayout
+                    android:id="@+id/emailLinearLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="20sp"
+                    app:layout_constraintTop_toBottomOf="@id/accountSettingTitle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    >
+
+                    <TextView
+                        android:text="Change Username: "
+                        android:textSize="17dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        />
+
+                    <EditText
+                        android:id="@+id/changeEmailInput"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:hint="Enter your new username"
+                        android:textStyle="italic">
+
+                        <requestFocus />
+                    </EditText>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/passwordLinearLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintTop_toBottomOf="@id/emailLinearLayout"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <TextView
+                        android:text="Change password: "
+                        android:textSize="18dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <EditText
+                        android:id="@+id/changePasswordInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Enter your new password"
+                        android:textStyle="italic"
+                        android:inputType="text"
+                        />
+
+                </LinearLayout>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Change"
+                    app:layout_constraintTop_toBottomOf="@id/passwordLinearLayout"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginTop="24sp"
+                    />
+
+
+             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </FrameLayout>
+
+            <!--单独悬浮的Logout按钮-->
             <Button
-                android:id="@+id/loggoutBtn"
+                android:id="@+id/logoutBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="monospace"
                 android:text="Logout"
                 android:textStyle="bold"
+                android:textSize="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.498"
+                app:layout_constraintHorizontal_bias="0.919"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.612"
+                app:layout_constraintVertical_bias="0.956"
                 app:strokeColor="#F41743"
                 app:strokeWidth="2dp" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </FrameLayout>
+
 </FrameLayout>
