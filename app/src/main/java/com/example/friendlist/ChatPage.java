@@ -144,32 +144,13 @@ public class ChatPage extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-//                            updateMessageView();
                         ((MyAdapter)msgListView.getAdapter()).updateData();
                     }
                 });
             }
         }
-            // 有新消息 (尝试对消息进行读取)
-            // sid,content,timestamp
-
-//            Message newMessage = new Message(senderID, myUid, content);
-
     }
 
-    // 更新'消息视图' [旧方法]
-    public void updateMessageView(){
-        // 从服务器获取最新的消息记录
-        // 1. 从服务器获取最新的消息记录
-        // 2. 将消息记录显示在聊天框中
-        // 3. 重复1-2
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                ((MyAdapter)msgListView.getAdapter()).updateData();
-            }
-        });
-    }
 
     // 返回按钮
     public void exitChat(View view){
