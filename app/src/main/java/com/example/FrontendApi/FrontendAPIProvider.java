@@ -1,5 +1,7 @@
 package com.example.FrontendApi;
 
+import com.example.friendlist.ChatPage;
+
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONArray;
@@ -16,6 +18,7 @@ public class FrontendAPIProvider extends WebSocketClient {
     public JSONArray all_message;
     public JSONArray friend_list;
     public JSONArray request_friendList;
+    public ChatPage chatPage;
 
     //User info
     public String action;
@@ -144,7 +147,7 @@ public class FrontendAPIProvider extends WebSocketClient {
             case "serverPush":
                 try {
                     handleServerPush(response);
-                } catch (JSONException e) {
+                } catch (JSONException | InterruptedException e) {
                     throw new RuntimeException(e);
                 }
                 break;
@@ -296,26 +299,36 @@ public class FrontendAPIProvider extends WebSocketClient {
     }
 
     //服务器推送，新的消息是否与自己有关
-    public void handleServerPush(JSONObject response) throws JSONException {
-        String client_action = response.optString("client_action", "client_action");
+    public void handleServerPush(JSONObject response) throws JSONException, InterruptedException {
+        String client_action = response.optString("client_action", "unknown");
         System.out.println("[←][Server] Server push: " + client_action);
 
-        //更新查询结果
+        // 根据服务器推送的 client_action 执行操作
         switch (client_action) {
             case "sendNewMessage":
-//                getLatestMessage(this.uid, this.fid);
+                // 确保 ChatPage 不为空，并调用其方法获取最新消息
+                if (chatPage != null) {
+                    chatPage.runOnUiThread(() -> {
+                        try {
+                            chatPage.getLatestMessage();
+                        } catch (InterruptedException | JSONException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                }
                 break;
             case "connectedNotify":
+                // 可以处理其他通知
                 break;
             case "addNewFriend":
+                // 处理添加好友的推送
                 break;
-
             default:
                 System.out.println("Unhandled action: " + client_action);
                 break;
         }
-        //To-do: 发起这个Provider的uid/fid是否跟上面两个一样
     }
+
 
 //    private void getLatestMessage() {
 //

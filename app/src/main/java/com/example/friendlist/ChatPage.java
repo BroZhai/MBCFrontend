@@ -44,8 +44,8 @@ public class ChatPage extends AppCompatActivity {
     Message previousMessage = null;
 
     // 来一个'定时器'，每隔一段时间就去'同步'一次消息
-    Timer timer = new Timer();;
-    MyTimerTask timerTask = new MyTimerTask();
+//    Timer timer = new Timer();;
+//    MyTimerTask timerTask = new MyTimerTask();
     private Handler handler = new Handler(Looper.getMainLooper());
 
     FrontendAPIProvider websocket;
@@ -60,6 +60,7 @@ public class ChatPage extends AppCompatActivity {
         messageList.addObserver(msgObserver);
 
         initWebSocket();
+        websocket.chatPage = this;
 
         SharedPreferences sp = getSharedPreferences("userdata", MODE_PRIVATE); // 从SP中读'本地用户'的用户名
         friendName = getIntent().getStringExtra("friendName");
@@ -73,7 +74,7 @@ public class ChatPage extends AppCompatActivity {
         msgListView = findViewById(R.id.chattingList);
         msgListView.setAdapter(new MyAdapter());
 
-        timer.schedule(timerTask, 1000, 300); // 每隔2秒同步一次消息
+//        timer.schedule(timerTask, 1000, 300); // 每隔2秒同步一次消息
     }
 
     // 发送按钮
@@ -105,37 +106,32 @@ public class ChatPage extends AppCompatActivity {
 
     public void getLatestMessage() throws InterruptedException, JSONException {
         websocket.getLatestMessage(myUid, friendUid);
-        sleep(200);
+        sleep(200); // 等待 WebSocket 响应
         JSONObject newMsg = websocket.latest_message;
-        if(newMsg==null){
+        if (newMsg == null) {
             Log.d("ChatPage", "目前还没有新消息");
-        }else {
+        } else {
             String judge = newMsg.getString("sid");
             String content = newMsg.getString("content");
-            if(!judge.equals(myUid)){
+            if (!judge.equals(myUid)) {
                 Log.d("ChatPage", "我有新消息: " + newMsg.toString());
                 String newTime = newMsg.getString("timestamp");
                 Message newMessage = new Message(judge, friendUid, content);
-                if(previousMessage!=null && previousMessage.getTime().equals(newTime)){
+                if (previousMessage != null && previousMessage.getTime().equals(newTime)) {
                     Log.d("ChatPage", "消息重复，不添加到消息列表中");
                     return;
                 }
                 previousMessage = newMessage;
                 previousMessage.setTime(newTime);
-
-                // 这是'好友'发的'新消息'
-                newMessage.setFriendMsg(true);
+                newMessage.setFriendMsg(true); // 设置为好友消息
                 messageList.addMsg(newMessage);
+
                 Log.d("ChatPage", "已将新消息添加到消息列表中");
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((MyAdapter)msgListView.getAdapter()).updateData();
-                    }
-                });
+                runOnUiThread(() -> ((MyAdapter) msgListView.getAdapter()).updateData());
             }
         }
     }
+
 
 
     // 返回按钮
@@ -148,15 +144,17 @@ public class ChatPage extends AppCompatActivity {
         try {
             URI uri = new URI("ws://10.0.2.2:8080/backend-api");
             websocket = new FrontendAPIProvider(uri);
+            websocket.chatPage = this; // 关联当前 ChatPage 实例
             websocket.connect();  // 异步连接
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
     }
 
+
     public void onDestroy() {
         super.onDestroy();
-        timer.cancel();
+//        timer.cancel();
         websocket.close();
     }
 /*---------------------------------------------------------分割线 -------------------------------------------------------*/
