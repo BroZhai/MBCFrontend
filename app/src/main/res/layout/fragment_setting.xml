@@ -76,7 +76,7 @@
                         />
 
                     <EditText
-                        android:id="@+id/changeEmailInput"
+                        android:id="@+id/changeUsernameInput"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:hint="Enter your new username"
@@ -113,6 +113,7 @@
                 </LinearLayout>
 
                 <Button
+                android:id="@+id/changeBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Change"
