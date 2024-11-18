@@ -162,8 +162,8 @@ public class ContactFragment extends Fragment {
                 Toast.makeText(ContactFragment.this.getActivity(), "You've clicked " + userList.getUserList().get(i).getName(), Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(ContactFragment.this.getActivity(), ChatPage.class);
                 intent.putExtra("friendName", userList.getUserList().get(i).getName());
-                intent.putExtra("friendID", userList.getUserList().get(i).getUid());
-                intent.putExtra("selfID", myUid);
+                intent.putExtra("friendUid", userList.getUserList().get(i).getUid());
+                intent.putExtra("myUid", myUid);
                 startActivity(intent);
             }
         });

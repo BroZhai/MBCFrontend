@@ -1,7 +1,10 @@
 package com.example.friendlist;
 
+import static java.lang.Thread.sleep;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -12,6 +15,13 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.FrontendApi.FrontendAPIProvider;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -27,6 +37,7 @@ public class ChatPage extends AppCompatActivity {
     MessageList messageList = new MessageList();
     MessageObserver msgObserver = new MessageObserver();
 
+    FrontendAPIProvider websocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,11 +48,14 @@ public class ChatPage extends AppCompatActivity {
         msgObserver = new MessageObserver();
         messageList.addObserver(msgObserver);
 
+        initWebSocket();
+
         SharedPreferences sp = getSharedPreferences("userdata", MODE_PRIVATE); // 从SP中读'本地用户'的用户名
         friendName = getIntent().getStringExtra("friendName");
         friendUid = getIntent().getStringExtra("friendUid");
         myUid = getIntent().getStringExtra("myUid");
         myName = sp.getString("username", "null");
+        Log.d("ChatPage", "当前正在和好友: " + friendName + "聊天, friendUid是: " + friendUid);
         TextView title = findViewById(R.id.friendTitle);
         title.setText("Chat with " + friendName);
 
@@ -59,9 +73,14 @@ public class ChatPage extends AppCompatActivity {
             Toast.makeText(this, "Message cannot be empty!", Toast.LENGTH_SHORT).show();
         }else {
             Message newMsg = new Message(myUid, friendUid, msg);
-            newMsg.setFriendMsg(false);
+            newMsg.setFriendMsg(false); // 这是'本地用户'发的消息
             messageList.addMsg(newMsg); // 将'发送消息'添加到'消息列表messageList'
-//            updateMessageView(); // 理论上来说，当messageList发生变化时，相应的Observer就会更新视图
+            try {
+                websocket.sendNewMessage(myUid, friendUid, msg); // 发送消息到服务器
+                sleep(400);
+            } catch (JSONException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
 
             Toast.makeText(this, "Message sent!", Toast.LENGTH_SHORT).show();
             messageField.setText("");
@@ -78,6 +97,18 @@ public class ChatPage extends AppCompatActivity {
         }
     }
 
+    public void getLatestMessage() throws InterruptedException, JSONException {
+        JSONObject newMsg = websocket.latest_message;
+        sleep(200);
+        if(newMsg==null){
+            Log.d("ChatPage", "目前还没有新消息");
+        }else {
+            // 有新消息
+            String sender = newMsg.getString("sender");
+
+        }
+
+    }
     // 更新'消息视图'
     public void updateMessageView(){
         // 从服务器获取最新的消息记录
@@ -90,6 +121,17 @@ public class ChatPage extends AppCompatActivity {
     // 返回按钮
     public void exitChat(View view){
         finish();
+    }
+
+    // 初始化WebSocket连接
+    public void initWebSocket() {
+        try {
+            URI uri = new URI("ws://10.0.2.2:8080/backend-api");
+            websocket = new FrontendAPIProvider(uri);
+            websocket.connect();  // 异步连接
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     // '真正的'消息列表 (被Observer监视的对象)
