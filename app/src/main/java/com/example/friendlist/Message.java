@@ -21,6 +21,10 @@ public class Message {
         return receiverUID;
     }
 
+    public String getTime() {
+        return time;
+    }
+
     public String getContent() {
         return content;
     }
@@ -29,6 +33,9 @@ public class Message {
         return isFriendMsg;
     }
 
+    public void setTime(String time) {
+        this.time = time;
+    }
 
     public void setSenderUID(String senderUID) {
         this.senderUID = senderUID;

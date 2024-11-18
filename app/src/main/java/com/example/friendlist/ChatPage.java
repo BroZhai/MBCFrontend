@@ -4,6 +4,8 @@ import static java.lang.Thread.sleep;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +27,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ChatPage extends AppCompatActivity {
 
@@ -36,6 +40,14 @@ public class ChatPage extends AppCompatActivity {
     ListView msgListView;
     MessageList messageList = new MessageList();
     MessageObserver msgObserver = new MessageObserver();
+
+    Message previousMessage = null;
+
+    // 来一个'定时器'，每隔一段时间就去'同步'一次消息
+    Timer timer = new Timer();;
+//    Timer timer;
+    MyTimerTask timerTask = new MyTimerTask();
+    private Handler handler = new Handler(Looper.getMainLooper());
 
     FrontendAPIProvider websocket;
 
@@ -61,6 +73,8 @@ public class ChatPage extends AppCompatActivity {
 
         msgListView = findViewById(R.id.chattingList);
         msgListView.setAdapter(new MyAdapter());
+
+        timer.schedule(timerTask, 1000, 2000); // 每隔2秒同步一次消息
     }
 
     // 发送按钮
@@ -73,9 +87,12 @@ public class ChatPage extends AppCompatActivity {
             Toast.makeText(this, "Message cannot be empty!", Toast.LENGTH_SHORT).show();
         }else {
             Message newMsg = new Message(myUid, friendUid, msg);
+            Log.e("Info","myUid:"+myUid +", friendUid:"+friendUid + "msg:"+msg);
             newMsg.setFriendMsg(false); // 这是'本地用户'发的消息
             messageList.addMsg(newMsg); // 将'发送消息'添加到'消息列表messageList'
             try {
+                websocket.uid = myUid;
+                websocket.fid = friendUid;
                 websocket.sendNewMessage(myUid, friendUid, msg); // 发送消息到服务器
                 sleep(400);
             } catch (JSONException | InterruptedException e) {
@@ -84,6 +101,9 @@ public class ChatPage extends AppCompatActivity {
 
             Toast.makeText(this, "Message sent!", Toast.LENGTH_SHORT).show();
             messageField.setText("");
+//            timer = new Timer();
+//            timer.schedule(timerTask, 1000, 2000);
+//            timer.schedule(timerTask, 1000, 2000); // 发送完消息，开始'同步消息'
             // 消息不为空 (AI gen的注释，感觉可以参考，但以实际情况为准)
             // 发送消息
             // 1. 将消息发送到服务器
@@ -98,24 +118,58 @@ public class ChatPage extends AppCompatActivity {
     }
 
     public void getLatestMessage() throws InterruptedException, JSONException {
-        JSONObject newMsg = websocket.latest_message;
+        websocket.getLatestMessage(myUid, friendUid);
         sleep(200);
+        JSONObject newMsg = websocket.latest_message;
+        System.out.println("newMsg: " + newMsg.toString());
         if(newMsg==null){
             Log.d("ChatPage", "目前还没有新消息");
         }else {
-            // 有新消息
-            String sender = newMsg.getString("sender");
+            String judge = newMsg.getString("sid");
+            String content = newMsg.getString("content");
+            if(judge.equals(myUid)){
+                Log.d("ChatPage", "我有新消息: " + newMsg.toString());
+                String newTime = newMsg.getString("timestamp");
+                Message newMessage = new Message(judge, friendUid, content);
+                if(previousMessage!=null && previousMessage.getTime().equals(newTime)){
+                    Log.d("ChatPage", "消息重复，不添加到消息列表中");
+                    return;
+                }
+                previousMessage = newMessage;
+                previousMessage.setTime(newTime);
 
+                // 这是'好友'发的'新消息'
+                newMessage.setFriendMsg(true);
+                messageList.addMsg(newMessage);
+                Log.d("ChatPage", "已将新消息添加到消息列表中");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+//                            updateMessageView();
+                        ((MyAdapter)msgListView.getAdapter()).updateData();
+                    }
+                });
+            }
         }
+            // 有新消息 (尝试对消息进行读取)
+            // sid,content,timestamp
+
+//            Message newMessage = new Message(senderID, myUid, content);
 
     }
-    // 更新'消息视图'
+
+    // 更新'消息视图' [旧方法]
     public void updateMessageView(){
         // 从服务器获取最新的消息记录
         // 1. 从服务器获取最新的消息记录
         // 2. 将消息记录显示在聊天框中
         // 3. 重复1-2
-        msgListView.setAdapter(new MyAdapter());
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ((MyAdapter)msgListView.getAdapter()).updateData();
+            }
+        });
     }
 
     // 返回按钮
@@ -134,6 +188,12 @@ public class ChatPage extends AppCompatActivity {
         }
     }
 
+    public void onDestroy() {
+        super.onDestroy();
+        timer.cancel();
+        websocket.close();
+    }
+/*---------------------------------------------------------分割线 -------------------------------------------------------*/
     // '真正的'消息列表 (被Observer监视的对象)
     public class MessageList extends Observable {
         private ArrayList<Message> list = new ArrayList<>();
@@ -157,6 +217,10 @@ public class ChatPage extends AppCompatActivity {
         public int getSize(){
             return list.size();
         }
+
+        public boolean contains(Message message){
+            return list.contains(message);
+        }
     }
 
     public class MessageObserver implements Observer {
@@ -166,6 +230,30 @@ public class ChatPage extends AppCompatActivity {
                 System.out.println("检测到消息列表中有新消息，已更新");
 //                updateMessageView();
                 ((MyAdapter)msgListView.getAdapter()).updateData();
+            }
+        }
+    }
+
+
+
+    // 定时器
+    public class MyTimerTask extends TimerTask {
+        @Override
+        public void run() {
+            System.out.println("消息此刻同步了: " + System.currentTimeMillis());
+            try {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            getLatestMessage();
+                        } catch (InterruptedException | JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }

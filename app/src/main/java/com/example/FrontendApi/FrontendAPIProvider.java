@@ -142,7 +142,11 @@ public class FrontendAPIProvider extends WebSocketClient {
 
             //服务器推送给所有客户端
             case "serverPush":
-                handleServerPush(response);
+                try {
+                    handleServerPush(response);
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
                 break;
             default:
                 System.out.println("[←][Server] Unhandled action: " + action);
@@ -292,14 +296,14 @@ public class FrontendAPIProvider extends WebSocketClient {
     }
 
     //服务器推送，新的消息是否与自己有关
-    public void handleServerPush(JSONObject response) {
+    public void handleServerPush(JSONObject response) throws JSONException {
         String client_action = response.optString("client_action", "client_action");
         System.out.println("[←][Server] Server push: " + client_action);
 
         //更新查询结果
         switch (client_action) {
             case "sendNewMessage":
-                getLatestMessage();
+//                getLatestMessage(this.uid, this.fid);
                 break;
             case "connectedNotify":
                 break;
@@ -313,10 +317,10 @@ public class FrontendAPIProvider extends WebSocketClient {
         //To-do: 发起这个Provider的uid/fid是否跟上面两个一样
     }
 
-    private void getLatestMessage() {
-
-
-    }
+//    private void getLatestMessage() {
+//
+//
+//    }
 
     //---------------------------------以上是处理服务器回应的方法------------------------------
 //---------------------------------以下是客户端发起的请求---------------------------------
