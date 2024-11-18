@@ -117,9 +117,9 @@ public class ContactFragment extends Fragment {
         // 初始化WebSocket连接，等待响应
         initWebSocket();
         try {
-            sleep(600);
+            sleep(400);
             websocket.getUserFriendList(myUid); // 向服务器请求: '当前用户'的好友列表
-            sleep(1000);
+            sleep(100);
             friendList = websocket.friend_list;
         } catch (InterruptedException | JSONException e) {
             throw new RuntimeException(e);
