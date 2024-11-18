@@ -1,25 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MessageFragment">
 
+        <TextView
+            android:id="@+id/messageTitle"
+            android:background="#74E7FA"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Message Page"
+            android:textSize="33dp"
+            android:gravity="center_horizontal"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/messageTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+            <ListView
+                android:id="@+id/messageListView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#fff"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
+        </FrameLayout>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No message yet..."
+            android:textStyle="italic"
+            android:textSize="23sp"
+            android:layout_gravity="center"
+            android:visibility="visible"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+
+
+
+
+
     <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:background="#74E7FA"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Message Page"
-        android:textSize="33dp"
-        android:layout_gravity="top|center_horizontal"
-        android:gravity="center_horizontal"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="消息视图界面"
-        android:textSize="33dp"
-        android:layout_gravity="center"/>
-
-</FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

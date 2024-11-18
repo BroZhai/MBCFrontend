@@ -127,7 +127,7 @@ public class AddContactFragment extends Fragment {
         try {
             sleep(700); // 等待WebSocket连接建立
             websocket.getFriendRequestList(currentUid);
-            sleep(1000);
+            sleep(1200);
         } catch (InterruptedException | JSONException e) {
             throw new RuntimeException(e);
             }
@@ -320,7 +320,7 @@ public class AddContactFragment extends Fragment {
                     String fid = requestList.getRequestList().get(i).getFUid();
                     try {
                         websocket.isFriendRequestAccept(currentUid, fid,"accepted");
-                        sleep(100);
+                        sleep(500);
                     } catch (JSONException | InterruptedException e) {
                         throw new RuntimeException(e);
                     }
@@ -341,7 +341,7 @@ public class AddContactFragment extends Fragment {
                     String fid = requestList.getRequestList().get(i).getFUid();
                     try {
                         websocket.isFriendRequestAccept(currentUid, fid,"blocked");
-                        sleep(100);
+                        sleep(500);
                     } catch (JSONException | InterruptedException e) {
                         throw new RuntimeException(e);
                     }

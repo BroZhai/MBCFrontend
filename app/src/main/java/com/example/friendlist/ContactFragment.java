@@ -127,14 +127,15 @@ public class ContactFragment extends Fragment {
 
         if(friendList != null){// 如果好友列表不为空
             System.out.println("当前用户好友列表不为空，正在读取好友列表...");
+            userList.getUserList().clear(); // 清空之前的'已缓存'好友列表
             System.out.println(friendList);
             for(int i = 0; i < friendList.length(); i++){
                 try {
                     String fname = friendList.getJSONObject(i).getString("uname");
-//                    String femail = friendList.getJSONObject(i).getString("email");  // 邮箱尚未能取得，等UG
+                    String femail = friendList.getJSONObject(i).getString("email");
                     String fuid = friendList.getJSONObject(i).getString("uid");
-//                    User u = new User(fname, "null", fuid);
-//                    userList.addUser(u);
+                    User u = new User(fname, femail, fuid);
+                    userList.addUser(u);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -193,6 +194,22 @@ public class ContactFragment extends Fragment {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         // 删除好友item 并 更新视图
                         Toast.makeText(ContactFragment.this.getActivity(), "You've deleted " + userList.getUserList().get(position).getName(), Toast.LENGTH_SHORT).show();
+
+                        // 向服务器发送删除好友请求
+                        try {
+                            String friendUid = userList.getUserList().get(position).getUid();
+                            String friendName = userList.getUserList().get(position).getName();
+                            websocket.deleteFriend(myUid,friendUid);
+                            sleep(700);
+                            if(websocket.success){
+                                Toast.makeText(ContactFragment.this.getActivity(), "You have deleted", Toast.LENGTH_SHORT).show();
+                                Log.d("DeleteFriend", "服务器端删除"+friendName+"好友成功");
+                            }
+                        } catch (InterruptedException | JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        // 及时更新本地数据 和 视图
                         userList.getUserList().remove(position);
                         listView.setAdapter(new MyAdapter());
                     }
