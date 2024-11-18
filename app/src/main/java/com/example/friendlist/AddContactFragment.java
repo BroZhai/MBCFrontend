@@ -125,9 +125,9 @@ public class AddContactFragment extends Fragment {
         initWebSocket(); // 创建该界面时，初始化WebSocket并尝试建立连接
 
         try {
-            sleep(700); // 等待WebSocket连接建立
+            sleep(400); // 等待WebSocket连接建立
             websocket.getFriendRequestList(currentUid);
-            sleep(1200);
+            sleep(200);
         } catch (InterruptedException | JSONException e) {
             throw new RuntimeException(e);
             }
