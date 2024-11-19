@@ -169,7 +169,7 @@ public class AddContactFragment extends Fragment {
                         // 原代码中的sleep(600)不是一个好的处理异步操作的方式，todo: 找到更好的解决方式
                         sleep(600);
                         if (websocket.success) {
-                            Toast.makeText(getContext(), "Friend request has successfully send to: " + emailStr, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Friend request has send to: " + emailStr, Toast.LENGTH_SHORT).show();
                             Log.d("WebSocketRegisiter", "服务器已成功响应好友请求" + emailStr);
                             input_email.setText("");
                             return;
