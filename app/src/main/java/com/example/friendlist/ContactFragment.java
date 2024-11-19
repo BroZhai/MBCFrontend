@@ -158,7 +158,7 @@ public class ContactFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(ContactFragment.this.getActivity(), "You are not chatting with " + userList.getUserList().get(i).getName(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(ContactFragment.this.getActivity(), "You are now chatting with " + userList.getUserList().get(i).getName(), Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(ContactFragment.this.getActivity(), ChatPage.class);
                 intent.putExtra("friendName", userList.getUserList().get(i).getName());
                 intent.putExtra("friendUid", userList.getUserList().get(i).getUid());
