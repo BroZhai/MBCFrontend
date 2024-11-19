@@ -77,7 +77,7 @@ public class LoginPage extends AppCompatActivity {
 
     public void initWebSocket() {
         try {
-            URI uri = new URI("ws://10.0.2.2:8080/backend-api");
+            URI uri = new URI("ws://www.gnetwork.space:8085/backend-api");
             websocket = new FrontendAPIProvider(uri);
             websocket.connect();  // 异步连接
         } catch (URISyntaxException e) {

@@ -117,9 +117,9 @@ public class ContactFragment extends Fragment {
         // 初始化WebSocket连接，等待响应
         initWebSocket();
         try {
-            sleep(400);
+            sleep(500);
             websocket.getUserFriendList(myUid); // 向服务器请求: '当前用户'的好友列表
-            sleep(100);
+            sleep(500);
             friendList = websocket.friend_list;
         } catch (InterruptedException | JSONException e) {
             throw new RuntimeException(e);
@@ -226,7 +226,7 @@ public class ContactFragment extends Fragment {
     // 初始化WebSocket连接
     public void initWebSocket() {
         try {
-            URI uri = new URI("ws://10.0.2.2:8080/backend-api");
+            URI uri = new URI("ws://www.gnetwork.space:8085/backend-api");
             websocket = new FrontendAPIProvider(uri);
             websocket.connect();  // 异步连接
         } catch (URISyntaxException e) {

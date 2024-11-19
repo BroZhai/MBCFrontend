@@ -81,7 +81,7 @@ public class AddContactFragment extends Fragment {
     // 初始化WebSocket
     public void initWebSocket() {
         try {
-            URI uri = new URI("ws://10.0.2.2:8080/backend-api");
+            URI uri = new URI("ws://www.gnetwork.space:8085/backend-api");
             websocket = new FrontendAPIProvider(uri);
             websocket.connect();  // 异步连接
         } catch (URISyntaxException e) {
@@ -125,9 +125,9 @@ public class AddContactFragment extends Fragment {
         initWebSocket(); // 创建该界面时，初始化WebSocket并尝试建立连接
 
         try {
-            sleep(400); // 等待WebSocket连接建立
+            sleep(500); // 等待WebSocket连接建立
             websocket.getFriendRequestList(currentUid);
-            sleep(200);
+            sleep(500);
         } catch (InterruptedException | JSONException e) {
             throw new RuntimeException(e);
             }

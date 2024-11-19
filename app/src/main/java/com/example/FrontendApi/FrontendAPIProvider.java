@@ -523,7 +523,7 @@ public class FrontendAPIProvider extends WebSocketClient {
     public static void main(String[] args) {
         try {
             // 创建 WebSocket 客户端并连接到 WebSocket 服务器
-            URI serverURI = new URI("ws://localhost:8080/backend-api");
+            URI serverURI = new URI("ws://www.gnetwork.space:8085/backend-api");
             FrontendAPIProvider client = new FrontendAPIProvider(serverURI);//onOpen会被执行
             client.connectBlocking();  // 阻塞，直到连接建立
             client.getFriendRequestList("7b2442e6-ae95-45f4-a2bf-c5a5b8051d6c");
