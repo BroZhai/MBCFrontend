@@ -39,13 +39,6 @@ public class LoginPage extends AppCompatActivity {
         inputEmail = findViewById(R.id.emailInput);
         inputPassword = findViewById(R.id.passwordInput);
 
-        initWebSocket();
-        try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
         // 尝试通过读取SharedPreferences实现'自动登录'
         SharedPreferences sp = getSharedPreferences("userdata", MODE_PRIVATE);
         if(sp!=null && sp.getBoolean("loginStatus", false)) {
@@ -55,8 +48,10 @@ public class LoginPage extends AppCompatActivity {
             Toast.makeText(LoginPage.this, "\""+email+"\" trying auto login...", Toast.LENGTH_SHORT).show();
             // 测试页面跳转
             try {
+                initWebSocket();
+                sleep(500);
                 websocket.login(email, password);
-                sleep(600);
+                sleep(650);
                 if(websocket.success) {
                     Log.d("AutoLoginResponse", "自动登录成功!");
                     Intent intent = new Intent(LoginPage.this, MainActivity.class);
@@ -93,9 +88,10 @@ public class LoginPage extends AppCompatActivity {
             Log.d("Login", "用户未输入邮箱或密码");
             return;
         }
-//        Toast.makeText(LoginPage.this, "已取得email: " + email +" 密码: " + password, Toast.LENGTH_SHORT).show();
         Log.d("Login", "已取得email: " + email +" 密码: " + password);
         try {
+            initWebSocket();
+            sleep(500);
             websocket.login(email, password);
             sleep(600);
             if(websocket.success) {

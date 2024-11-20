@@ -105,7 +105,7 @@ public class ChatPage extends AppCompatActivity {
 
     public void getLatestMessage() throws InterruptedException, JSONException {
         websocket.getLatestMessage(myUid, friendUid);
-        sleep(450);
+        sleep(500);
         JSONObject newMsg = websocket.latest_message;
         if(newMsg==null){
             Log.d("ChatPage", "目前还没有新消息");
