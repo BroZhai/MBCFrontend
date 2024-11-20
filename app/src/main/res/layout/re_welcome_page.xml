@@ -49,7 +49,7 @@
             >
 
             <TextView
-                android:text="email: "
+                android:text="E-mail: "
                 android:textSize="18dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -75,7 +75,7 @@
             android:layout_marginLeft="22dp">
 
             <TextView
-                android:text="password: "
+                android:text="Password: "
                 android:textSize="18dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
@@ -120,7 +120,7 @@
             android:layout_marginTop="12sp"
             android:onClick="goRegister"/>
         <TextView
-            android:text="2024 Mobile Computing Group 4 All rights reserved"
+            android:text="2024 Mobile Computing Group 4 \n Rokidna G and Tekon \n All rights reserved"
             android:layout_marginTop="40dp"
             android:textSize="16sp"
             android:textAlignment="center"
