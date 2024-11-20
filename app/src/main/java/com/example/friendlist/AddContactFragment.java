@@ -127,7 +127,7 @@ public class AddContactFragment extends Fragment {
         try {
             sleep(500); // 等待WebSocket连接建立
             websocket.getFriendRequestList(currentUid);
-            sleep(500);
+            sleep(750);
         } catch (InterruptedException | JSONException e) {
             throw new RuntimeException(e);
             }
