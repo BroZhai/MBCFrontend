@@ -5,6 +5,7 @@ a project for MBC<br>
 ### 概要 Briefing
 A simple Android chat app
 写下一个课的安卓界面前端界面，大工程，准备对接偷摸大鸡的超级后端:3 <br>
+**感谢Rokidna桑的 强 大 后 台 支 持**
 温馨提示: 这个app有点奇怪，心情不好就会闹脾气闪退👀💦💦<br>
 我的app内邮箱: tekon@qq.com<br>
 ![4c42d5eb96863cee3f671f12903fd3f9](https://github.com/user-attachments/assets/b01dab94-4d44-4a0d-a20f-70a3d8d819a1)<br>
