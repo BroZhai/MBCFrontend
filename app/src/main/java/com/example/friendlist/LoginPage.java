@@ -38,7 +38,7 @@ public class LoginPage extends AppCompatActivity {
 
         inputEmail = findViewById(R.id.emailInput);
         inputPassword = findViewById(R.id.passwordInput);
-
+        //
         // 尝试通过读取SharedPreferences实现'自动登录'
         SharedPreferences sp = getSharedPreferences("userdata", MODE_PRIVATE);
         if(sp!=null && sp.getBoolean("loginStatus", false)) {
